@@ -1,0 +1,144 @@
+<style>__CSS__</style>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-mark">Speak&nbsp;B1</span>
+      <span class="brand-sub" dir="rtl" lang="ar">كل الكلمات في مواضيع للتحدث</span>
+    </div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path>
+      </svg>
+      <input id="search" type="search" autocomplete="off" spellcheck="false"
+             placeholder="Search a word… /  ابحث عن كلمة" aria-label="Search vocabulary">
+      <button id="searchClear" class="search-clear" aria-label="Clear search" type="button">×</button>
+    </div>
+    <button id="expandAll" class="icon-btn" title="Expand all topics" type="button" aria-label="Expand all">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round"><path d="M7 13l5 5 5-5"></path><path d="M7 6l5 5 5-5"></path></svg>
+    </button>
+    <button id="collapseAll" class="icon-btn" title="Collapse all topics" type="button" aria-label="Collapse all">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round"><path d="M17 11l-5-5-5 5"></path><path d="M17 18l-5-5-5 5"></path></svg>
+    </button>
+    <button id="themeBtn" class="icon-btn" title="Toggle light / dark" type="button" aria-label="Toggle theme">
+      <svg class="theme-light-only" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+      <svg class="theme-dark-only" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+    </button>
+  </div>
+</header>
+
+<div class="shell">
+
+  <section class="hero">
+    <p class="eyebrow">Vocabulary → Speaking Topics · مستوى B1</p>
+    <h1>English Words, <span class="amp">organized</span> to talk from.</h1>
+    <p class="hero-ar" dir="rtl" lang="ar">كل كلماتك مُرتّبة في مواضيع تقدر تتكلم بيها</p>
+    <p class="hero-lead" dir="rtl" lang="ar">
+      جمّعت لك كل الكلمات من ملفاتك الثلاثة وأعدت ترتيبها من قوائم أبجدية ومستويات
+      إلى <b>مواضيع للتحدث</b> مناسبة لمستوى B1. كل موضوع فيه: مفردات (إنجليزي +
+      عربي)، وجُمل جاهزة، وأسئلة تتدرّب بها على الكلام — بالإضافة إلى مراجع للأفعال
+      والأزمنة والمترادفات.
+    </p>
+    <div class="stats">
+      <div class="stat"><b>__N_TOPICS__</b><span dir="rtl" lang="ar">موضوعًا للتحدث</span></div>
+      <div class="stat"><b>__TOTAL_WORDS__+</b><span dir="rtl" lang="ar">كلمة مصنّفة</span></div>
+      <div class="stat"><b>A1–B2</b><span dir="rtl" lang="ar">تدرّج المستويات</span></div>
+      <div class="stat"><b>3 → 1</b><span dir="rtl" lang="ar">ملفات في مرجع واحد</span></div>
+    </div>
+  </section>
+
+  <div class="howto">
+    <h2>How to use · طريقة الاستخدام</h2>
+    <ul>
+      <li><span class="n">1</span><span><b>اقرأ الكلمات بصوت عالٍ</b> — غطِّ العمود العربي وتذكّر المعنى، ثم العكس.</span></li>
+      <li><span class="n">2</span><span><b>اختر موضوعًا</b> من الفهرس وتكلّم عنه دقيقة كاملة مستخدمًا مفرداته وجُمله.</span></li>
+      <li><span class="n">3</span><span><b>أجب عن أسئلة «تدرّب على الكلام»</b> (الصندوق البرتقالي) بصوتك.</span></li>
+      <li><span class="n">4</span><span><b>ابحث</b> عن أي كلمة من شريط البحث بالأعلى (إنجليزي أو عربي).</span></li>
+    </ul>
+  </div>
+
+  <nav aria-label="Contents">
+    <div class="sec-title"><h2>Jump to…</h2><span class="sec-ar" dir="rtl" lang="ar">اذهب إلى موضوع</span></div>
+    <div class="toc">__TOC__</div>
+  </nav>
+
+  <section class="sec">
+    <div class="sec-title"><h2>Speaking Topics</h2><span class="sec-ar" dir="rtl" lang="ar">مواضيع للتحدث</span></div>
+    __TOPICS__
+  </section>
+
+  <section class="sec ref" id="ref-verbs">
+    <div class="sec-title"><h2>Essential Verbs</h2><span class="sec-ar" dir="rtl" lang="ar">أهم الأفعال — التصريفات الثلاثة</span></div>
+    <div class="card ref-block">
+      <p class="ref-note" dir="rtl" lang="ar">أهم الأفعال الشاذة والشائعة: المصدر ← الماضي ← اسم المفعول. ضرورية جدًا لتكوين الأزمنة.</p>
+      __VERBS3__
+    </div>
+  </section>
+
+  <section class="sec ref" id="ref-tenses">
+    <div class="sec-title"><h2>Tenses</h2><span class="sec-ar" dir="rtl" lang="ar">الأزمنة — التركيب والأمثلة</span></div>
+    <div class="card ref-block">
+      <p class="ref-note" dir="rtl" lang="ar">أحد عشر زمنًا أساسيًا مع الاستخدام والتركيب وأمثلة — عمود فقري لأي حديث سليم.</p>
+      __TENSES__
+    </div>
+  </section>
+
+  <section class="sec ref" id="ref-patterns">
+    <div class="sec-title"><h2>Verb Patterns</h2><span class="sec-ar" dir="rtl" lang="ar">to + فعل &nbsp;/&nbsp; فعل + ing</span></div>
+    <div class="card ref-block">
+      <p class="ref-note" dir="rtl" lang="ar">بعض الأفعال يأتي بعدها المصدر (to + verb)، وبعضها يأتي بعدها (verb + ing). تعلّمها يمنع أخطاء شائعة في الكلام.</p>
+      <div class="pat-cols">
+        <div class="pat-box">
+          <h4>to + infinitive</h4>
+          <p class="pat-sub" dir="rtl" lang="ar">أفعال يتبعها المصدر</p>
+          __TO_INF__
+        </div>
+        <div class="pat-box">
+          <h4>verb + -ing (gerund)</h4>
+          <p class="pat-sub" dir="rtl" lang="ar">أفعال يتبعها الـ ing</p>
+          __GERUND__
+        </div>
+      </div>
+      <p class="pat-hint" dir="rtl" lang="ar">كلمات يتغيّر معناها حسب ما يأتي بعدها (مثل remember):</p>
+      <div class="both-wrap">__BOTH__</div>
+      <p class="pat-hint" dir="rtl" lang="ar">تعبيرات يأتي بعدها دائمًا فعل + ing:</p>
+      __EXPR__
+    </div>
+  </section>
+
+  <section class="sec ref" id="ref-phrases">
+    <div class="sec-title"><h2>Speaking Phrases</h2><span class="sec-ar" dir="rtl" lang="ar">جُمل جاهزة حسب الموقف</span></div>
+    <div class="card ref-block">
+      <p class="ref-note" dir="rtl" lang="ar">جُمل شائعة مرتّبة حسب الموقف — احفظها كوحدة واحدة واستخدمها فورًا.</p>
+      <div class="sit-grid">__PHRASES__</div>
+    </div>
+  </section>
+
+  <section class="sec ref" id="ref-synonyms">
+    <div class="sec-title"><h2>Synonyms — level up</h2><span class="sec-ar" dir="rtl" lang="ar">مترادفات ترفع مستواك</span></div>
+    <div class="card ref-block">
+      <p class="ref-note" dir="rtl" lang="ar">بدّل الكلمة الشائعة بمرادف أرقى ليبدو حديثك أكثر احترافية.</p>
+      __SYNONYMS__
+    </div>
+  </section>
+
+  <div id="noResults" class="noresults">
+    <b>No matching words.</b>
+    <span dir="rtl" lang="ar">لا توجد كلمات مطابقة — جرّب كلمة أخرى.</span>
+  </div>
+
+</div>
+
+<footer class="foot">
+  <span>Speak B1 · reorganized from your 3 study files into speaking topics.</span>
+  <span class="foot-ar" dir="rtl" lang="ar">بالتوفيق في تعلّم الإنجليزية 🌱</span>
+</footer>
+
+<button id="toTop" title="Back to top" aria-label="Back to top" type="button">↑</button>
+
+<script>__JS__</script>
