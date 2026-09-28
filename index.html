@@ -667,7 +667,9 @@ function drawPowerups(frac) {
   }
   return out;
 }
-const pwCard = (id, attrs = '', tag = 'button') => { const p = POWERUPS[id]; return `<${tag} class="pw-card" style="--pc:${p.color}" ${attrs}><span class="ico">${PW_ICON[id]}</span><span class="rar ${p.rarity}">${p.rarity}</span><b>${esc(p.name)}</b><small>${esc(p.desc)}</small></${tag}>`; };
+const ONLINE_DESC = { glitch: "Scramble everyone else's screen for 5 seconds.", freeze: 'Keep the full speed bonus, however long you take.' };
+const pwDesc = id => ((typeof Host !== 'undefined' && Host.active) || (typeof Player !== 'undefined' && Player.active)) && ONLINE_DESC[id] ? ONLINE_DESC[id] : POWERUPS[id].desc;
+const pwCard = (id, attrs = '', tag = 'button') => { const p = POWERUPS[id]; return `<${tag} class="pw-card" style="--pc:${p.color}" ${attrs}><span class="ico">${PW_ICON[id]}</span><span class="rar ${p.rarity}">${p.rarity}</span><b>${esc(p.name)}</b><small>${esc(pwDesc(id))}</small></${tag}>`; };
 
 /* ---------------- avatars ---------------- */
 const INK = '#17132F';
