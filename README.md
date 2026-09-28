@@ -8,4 +8,4 @@ A live conjunctions quiz game for Grade 10.
 
 Only players who answer correctly earn a power-up pick after each question.
 
-Play it at https://emanelzordok666.github.io/Emanelzordok666/ — it can be installed to a home screen like an app.
+Play it at **https://tinyurl.com/clause-and-effect-game** (short link) or https://emanelzordok666.github.io/Emanelzordok666/ — it can be installed to a home screen like an app.

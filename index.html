@@ -424,6 +424,7 @@ legend{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:
 .dots{display:flex;gap:10px;justify-content:center}
 .dots i{width:14px;height:14px;border-radius:50%;background:var(--sun);animation:bob 1s ease-in-out infinite}
 .dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+.short-link{font-size:14px;font-weight:800;background:rgba(23,19,47,.1);border-radius:10px;padding:6px 10px}
 .room-note{margin:0;font-size:14px;font-weight:800;color:rgba(23,19,47,.75)}
 .linkish{border:0;background:none;padding:0;color:var(--ink);font-weight:900;text-decoration:underline;cursor:pointer}
 .review{width:min(900px,100%);display:flex;flex-direction:column;gap:12px;text-align:left}
@@ -1690,6 +1691,7 @@ const App = {
       const url = this.joinUrl(code);
       return `<span class="link-label">Game link</span><span class="url" id="joinUrl">${esc(url)}</span>
         <div class="link-btns"><button class="copy" data-act="copy-link">${ICON.copy} Copy link</button>${navigator.share ? `<button class="copy" data-act="share-link">${ICON.share} Share</button>` : ''}</div>
+        ${/github\.io$/.test(location.hostname) ? `<span class="short-link">Or type <b>tinyurl.com/clause-and-effect-game</b> and enter code <b>${esc(code)}</b></span>` : ''}
         <span>Players open the link or scan the code:</span>`;
     }
     return `<span>On each phone, open this game (the website, or the game file in Chrome on Android), tap <b>Join a game</b> and type the code.</span>`;
