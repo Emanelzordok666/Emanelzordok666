@@ -404,6 +404,28 @@ legend{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:
 .hq .sk{font-size:clamp(15px,1.5vw,19px);padding:4px 16px 4px 4px}
 .hq .sk .avw{width:clamp(34px,3vw,44px)}
 .hq .sk svg{width:22px;height:22px}
+.review-cta{border:0;background:var(--sun);color:var(--ink);border-radius:20px;padding:14px 20px;display:flex;align-items:center;gap:14px;text-align:left;box-shadow:0 7px 0 var(--sun-deep);width:min(760px,100%);animation:pulse 1.8s ease-in-out infinite}
+.review-cta:active{transform:translateY(4px);box-shadow:0 3px 0 var(--sun-deep)}
+.review-cta svg{width:30px;height:30px;flex:none}
+.review-cta span{flex:1;display:flex;flex-direction:column;font-weight:800;font-size:15px}
+.review-cta b{font-family:var(--font-display);font-weight:400;font-size:clamp(22px,2.4vw,30px);line-height:1.1}
+.review-screen{flex:1;display:flex;flex-direction:column;align-items:center;padding-top:6px}
+.review-screen .review{width:min(1320px,100%)}
+.review-screen .review h3{font-size:clamp(36px,4.6vw,60px)}
+.review-screen .rv-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.review-screen .rv-q{font-size:clamp(18px,1.7vw,24px)}
+.review-screen .rv-why{font-size:clamp(15px,1.3vw,18px)}
+.rv-list{display:flex;flex-direction:column;gap:12px}
+.review-screen .rv-list{display:grid}
+.final-head{display:flex;align-items:center;gap:14px;background:var(--stage-2);border:3px solid var(--line);border-radius:22px;padding:12px 14px}
+.final-head .sub{margin:4px 0 0;text-align:left;font-size:15px}
+.medal.sm{width:64px;font-size:32px;flex:none;box-shadow:0 5px 0 rgba(0,0,0,.3)}
+.bigtitle.sm{font-size:clamp(26px,7vw,34px);text-align:left}
+.dots{display:flex;gap:10px;justify-content:center}
+.dots i{width:14px;height:14px;border-radius:50%;background:var(--sun);animation:bob 1s ease-in-out infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+.room-note{margin:0;font-size:14px;font-weight:800;color:rgba(23,19,47,.75)}
+.linkish{border:0;background:none;padding:0;color:var(--ink);font-weight:900;text-decoration:underline;cursor:pointer}
 .review{width:min(900px,100%);display:flex;flex-direction:column;gap:12px;text-align:left}
 .review h3{font-family:var(--font-display);font-weight:400;font-size:clamp(26px,3vw,36px);margin:0;text-align:center;line-height:1.1}
 .review > .sub{text-align:center}
@@ -506,6 +528,7 @@ button.tile:disabled .tx{text-decoration:line-through}
 .stat.pstat .avw{width:48px;flex:none}
 .stat.pstat b{font-family:var(--font-body);font-weight:900;font-size:18px;color:#fff}
 @media (max-width:900px){
+  .review-screen .rv-list{grid-template-columns:1fr}
   .choices.three{grid-template-columns:1fr}
   .choices.three .choice{grid-template-columns:auto 1fr;gap:4px 16px}
   .choices.three .choice .ci{grid-row:span 2}
@@ -704,6 +727,11 @@ function drawPowerups(frac) {
     if (pool.length) out.push(pick(pool));
   }
   return out;
+}
+function reviewCta(n, played, act) {
+  if (!played) return '';
+  if (!n) return `<p class="earn yes">${ICON.check}Perfect game: nobody got a question wrong!</p>`;
+  return `<button class="review-cta" data-act="${act}">${ICON.bulb}<span><b>Review the answers</b>${n} question${n > 1 ? 's' : ''} someone got wrong, with explanations</span>${ICON.next}</button>`;
 }
 function streakNote(r, streak) {
   if (r.ok && streak >= 2) { const b = r.lines.find(l => /^Streak/.test(l[0])); return `<div class="streak-banner">${ICON.flame}<span><b>${streakTitle(streak)}</b> ${streak} in a row${b ? ` \u00b7 streak bonus ${esc(b[1])}` : ''}</span></div>`; }
@@ -1284,7 +1312,7 @@ const Game = {
 
   /* ---------- rendering ---------- */
   hbar() {
-    const inGame = !['podium'].includes(this.phase);
+    const inGame = !['podium', 'review'].includes(this.phase);
     const prog = `<div class="qprog" aria-label="Question ${this.qi + 1} of ${this.questions.length}">${this.questions.map((_, i) => `<i class="${i < this.qi || (i === this.qi && ['reveal', 'board', 'draft'].includes(this.phase)) ? 'done' : i === this.qi ? 'now' : ''}"></i>`).join('')}</div>`;
     return `<header class="hbar">
       <div class="hb-brand"><span class="mini-logo">Clause<b>&amp;</b>Effect</span></div>
@@ -1407,12 +1435,21 @@ const Game = {
     const rows = this.questions.map((q, qi) => ({ q, qi, miss: hs.filter(p => p.hist.some(h => h.qi === qi && !h.ok)) })).filter(x => x.miss.length).sort((a, b) => b.miss.length - a.miss.length);
     if (!rows.length) return `<section class="review"><h3>Perfect game!</h3><p class="sub">Nobody got a question wrong.</p></section>`;
     const who = x => `<div class="rv-who">${x.miss.map(p => { const h = p.hist.find(y => y.qi === x.qi); return `<span>${avw(p.av)}<b dir="auto">${esc(p.name)}</b>${h.choice != null ? ' said ' + esc(x.q.o[h.choice]) : ' didn\u2019t answer'}</span>`; }).join('')}</div>`;
-    return `<section class="review"><h3>Review the mistakes</h3><p class="sub">Every question someone got wrong, with the right answer and why.</p>${rows.map(x => reviewCardHTML({ q: x.q.q, right: x.q.o[x.q.a], why: x.q.why }, who(x))).join('')}</section>`;
+    return `<section class="review"><h3>Review the mistakes</h3><p class="sub">Every question someone got wrong, with the right answer and why.</p><div class="rv-list">${rows.map(x => reviewCardHTML({ q: x.q.q, right: x.q.o[x.q.a], why: x.q.why }, who(x))).join('')}</div></section>`;
   },
-  renderPodium() {
+  reviewCount() { const hs = this.humans(); return this.questions.filter((q, qi) => hs.some(p => p.hist.some(h => h.qi === qi && !h.ok))).length;
+  },
+  renderReview() {
+    this.clear(); this.phase = 'review';
+    this.frame(`<main class="review-screen">${this.reviewSection()}</main>`,
+      `<button class="btn ghost" data-act="g-podium">${ICON.back} Back to results</button><span class="spacer"></span><button class="btn xl" data-act="g-again" data-primary>${ICON.play} Play again</button>`);
+    window.scrollTo(0, 0);
+  },
+  renderPodium(quiet) {
+    this.phase = 'podium';
     const r = this.ranked(), top = [r[1], r[0], r[2]];
     const crown = `<svg class="crown" viewBox="0 0 64 40" aria-hidden="true"><path d="M4 36L8 6L22 22L32 2L42 22L56 6L60 36Z" fill="#FFC42E" stroke="#8F5F00" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="26" r="4" fill="#FF4F7A"/></svg>`;
-    const pod = (p, place) => p ? `<div class="pod p${place}" id="pod${place}">${place === 1 ? crown : ''}<div class="pav">${avatarSVG(p.av)}</div><div class="pname" dir="auto">${esc(p.name)}${p.bot ? ' <em class="cpu">CPU</em>' : ''}</div><div class="pscore">${fmtN(p.score)}</div><div class="block">${place}</div></div>` : `<div class="pod p${place}" id="pod${place}"></div>`;
+    const pod = (p, place) => p ? `<div class="pod p${place} ${quiet ? 'show' : ''}" id="pod${place}">${place === 1 ? crown : ''}<div class="pav">${avatarSVG(p.av)}</div><div class="pname" dir="auto">${esc(p.name)}${p.bot ? ' <em class="cpu">CPU</em>' : ''}</div><div class="pscore">${fmtN(p.score)}</div><div class="block">${place}</div></div>` : `<div class="pod p${place}" id="pod${place}"></div>`;
     const humans = this.humans(), winner = r[0];
     const headline = !winner ? 'Final results' : winner.bot ? `${esc(winner.name)} wins this time!` : `<span dir="auto">${esc(winner.name)}</span> wins!`;
     const stats = humans.map(p => `<div class="stat pstat">${avw(p.av)}<div><b dir="auto">${esc(p.name)}</b><span>${ordinal(this.rankOf(p))} place · ${p.correct} of ${this.qPlayed} correct · best streak ${p.best}</span></div></div>`).join('');
@@ -1422,8 +1459,9 @@ const Game = {
       <div class="podium">${pod(top[0], 2)}${pod(top[1], 1)}${pod(top[2], 3)}</div>
       ${r.length > 3 ? `<div class="rest">${r.slice(3).map((p, i) => `<span>${i + 4}. <b dir="auto">${esc(p.name)}</b> ${fmtN(p.score)}</span>`).join('')}</div>` : ''}
       <div class="stats">${stats}${hardest ? `<div class="stat"><b>${Math.round(hardest.pct * 100)}%</b><span>got the toughest one right: “${esc(hardest.text.replace(/___/g, '…'))}”</span></div>` : ''}</div>
-      ${this.reviewSection()}
-    </main>`, `<button class="btn ghost" data-act="g-setup">Change players</button><span class="spacer"></span><button class="btn xl" data-act="g-again" data-primary>${ICON.play} Play again</button>`);
+      ${reviewCta(this.reviewCount(), this.qPlayed, 'g-review')}
+    </main>`, `<button class="btn ghost" data-act="g-setup">Change players</button><span class="spacer"></span>${this.reviewCount() ? `<button class="btn ghost" data-act="g-again">${ICON.play} Play again</button><button class="btn xl" data-act="g-review" data-primary>${ICON.bulb} Review answers</button>` : `<button class="btn xl" data-act="g-again" data-primary>${ICON.play} Play again</button>`}`);
+    if (quiet) return;
     Sound.play('drum');
     const show = (id, d) => this.later(() => { const el = $('#pod' + id); if (el) el.classList.add('show'); }, d);
     show(3, 700); show(2, 1500); show(1, 2500);
@@ -1459,6 +1497,8 @@ Actions['g-opt'] = el => { Game.setAv({ ...Game.draftP.av, [Game.tab]: +el.datas
 Actions['g-randav'] = () => { Game.setAv(randomAv()); Sound.play('join'); };
 Actions['g-start'] = () => Game.start();
 Actions['g-again'] = () => Game.start();
+Actions['g-review'] = () => Game.renderReview();
+Actions['g-podium'] = () => { Game.clear(); Game.renderPodium(true); };
 Actions['g-skip-cd'] = () => { if (Game.phase === 'intro') Game.beginTurn(); };
 Actions['g-go'] = () => { if (Game.phase === 'handoff') Game.startTurn(); };
 Actions['g-answer'] = el => Game.answer(+el.dataset.i);
@@ -1670,7 +1710,14 @@ const Install = {
   ios() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); },
   init() {
     if (!this.web()) return;
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+    if ('serviceWorker' in navigator) {
+      const had = !!navigator.serviceWorker.controller; let reloaded = false;
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(r => { try { r.update(); } catch (e) {} }).catch(() => {});
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!had || reloaded || Host.active || Player.active || !['home', 'setup', 'edit', 'off'].includes(Game.phase)) return;
+        reloaded = true; location.reload();
+      });
+    }
     addEventListener('beforeinstallprompt', e => { e.preventDefault(); this.evt = e; this.show(); });
     addEventListener('appinstalled', () => { this.evt = null; this.show(); toast('Clause & Effect is installed. Open it from your home screen.', '#3DDC97', ICON.check); });
     this.show();
@@ -1785,12 +1832,28 @@ const Host = {
     Sound.ensure(); Sound.on = this.settings.sound; Sound.music = this.settings.sound;
     const net = this.net = App.getNet();
     this.hs = uid(); this.seq = 0; this.players.clear(); this.drawn.clear(); this.qi = -1;
-    this.code = Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[ri(24)]).join('');
+    this.code = this.roomCode(false);
     await net.hostStart(this.code, (pid, m, meta) => this.onMsg(pid, m, meta));
     if (!this.active) { net.leave(); return; }
     this.phase = 'lobby'; this.renderLobby(); this.publish();
     clearInterval(this.hbT); this.hbT = setInterval(() => this.heartbeat(), 2500);
     Music.bpm = 104; Music.start(); keepAwake();
+  },
+  roomCode(fresh) {
+    let c = fresh ? null : store.get('ce-room');
+    if (typeof c !== 'string' || !/^[A-Z]{4}$/.test(c)) { c = Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[ri(24)]).join(''); store.set('ce-room', c); }
+    return c;
+  },
+  async newCode(el) {
+    if (this.phase !== 'lobby') return;
+    if (this.players.size) { toast('Remove the players first, or keep this code.', '#FF8CC0'); return; }
+    if (el) { el.disabled = true; el.textContent = 'Getting a new code\u2026'; }
+    const old = this.code;
+    try { this.net.pub({ hs: this.hs, seq: ++this.seq, phase: 'closed' }); } catch (e) {}
+    this.code = this.roomCode(true);
+    try { await this.net.hostStart(this.code, (pid, m, meta) => this.onMsg(pid, m, meta)); }
+    catch (e) { this.code = old; store.set('ce-room', old); toast('Couldn\u2019t reach the game server. Kept the old code.', '#FF8CC0'); try { await this.net.hostStart(old, (pid, m, meta) => this.onMsg(pid, m, meta)); } catch (e2) {} }
+    this.renderLobby(); this.publish();
   },
   heartbeat() {
     this.publish();
@@ -2009,6 +2072,7 @@ const Host = {
     else if (ph === 'question') this.reveal();
     else if (ph === 'reveal') this.toBoard();
     else if (ph === 'board') this.startQuestion(this.qi + 1);
+    else if (ph === 'podium' && this.view !== 'review' && this.reviewCount()) this.renderReview();
   },
   endGame() { if (this.qPlayed) this.podium(); else this.backToLobby(); },
   backToLobby() {
@@ -2068,6 +2132,7 @@ const Host = {
         <div class="code-tiles" aria-label="Game code ${[...this.code].join(' ')}">${[...this.code].map((ch, i) => `<span style="--r:${i % 2 ? 3 : -3}deg">${ch}</span>`).join('')}</div>
         <div class="join-how">${App.joinHow(this.code)}</div>
         <div class="qr" id="qrBox" hidden></div>
+        <p class="room-note">This code and link stay the same every time you host on this device.${this.players.size ? '' : ' <button class="linkish" data-act="h-newcode">Get a new code</button>'}</p>
       </section>
       <section class="lobby-players">
         <div class="lp-head"><h2><span id="pcount">0</span> <span id="pword">players</span></h2><span class="net-chip">${esc({ online: 'Online', local: 'Test mode' }[this.net.kind] || '')}</span></div>
@@ -2201,12 +2266,23 @@ const Host = {
     }).filter(x => x.miss > 0).sort((a, b) => b.miss - a.miss);
     if (!this.qPlayed) return '';
     if (!rows.length) return `<section class="review"><h3>Perfect game!</h3><p class="sub">Nobody got a question wrong.</p></section>`;
-    return `<section class="review"><h3>Questions to review</h3><p class="sub">Every question someone got wrong, most missed first.</p>${rows.map(x => reviewCardHTML({ q: x.q.q, right: x.q.o[x.q.a], why: x.q.why }, `<p class="rv-meta">Missed by ${x.miss} of ${x.total}</p>`)).join('')}</section>`;
+    return `<section class="review"><h3>Questions to review</h3><p class="sub">Every question someone got wrong, most missed first.</p><div class="rv-list">${rows.map(x => reviewCardHTML({ q: x.q.q, right: x.q.o[x.q.a], why: x.q.why }, `<p class="rv-meta">Missed by ${x.miss} of ${x.total}</p>`)).join('')}</div></section>`;
   },
-  renderPodium() {
+  reviewCount() {
+    const all = [...this.players.values()], humans = all.filter(p => !p.bot), ppl = humans.length ? humans : all;
+    return this.questions.filter((q, qi) => ppl.some(p => (p.hist || []).some(h => h.qi === qi && !h.ok))).length;
+  },
+  renderReview() {
+    this.view = 'review';
+    this.frame(`<main class="review-screen">${this.reviewSection()}</main>`,
+      `<button class="btn ghost" data-act="h-podium">${ICON.back} Back to results</button><span class="spacer"></span><button class="btn ghost" data-act="h-new">New game</button><button class="btn xl" data-act="h-again">${ICON.play} Play again</button>`);
+    window.scrollTo(0, 0);
+  },
+  renderPodium(quiet) {
+    this.view = 'podium';
     const r = this.ranked(), top = [r[1], r[0], r[2]];
     const crown = `<svg class="crown" viewBox="0 0 64 40" aria-hidden="true"><path d="M4 36L8 6L22 22L32 2L42 22L56 6L60 36Z" fill="#FFC42E" stroke="#8F5F00" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="26" r="4" fill="#FF4F7A"/></svg>`;
-    const pod = (p, place) => p ? `<div class="pod p${place}" id="pod${place}">${place === 1 ? crown : ''}<div class="pav">${avatarSVG(p.av)}</div><div class="pname" dir="auto">${esc(p.name)}</div><div class="pscore">${fmtN(p.score)}</div><div class="block">${place}</div></div>` : `<div class="pod p${place}" id="pod${place}"></div>`;
+    const pod = (p, place) => p ? `<div class="pod p${place} ${quiet ? 'show' : ''}" id="pod${place}">${place === 1 ? crown : ''}<div class="pav">${avatarSVG(p.av)}</div><div class="pname" dir="auto">${esc(p.name)}</div><div class="pscore">${fmtN(p.score)}</div><div class="block">${place}</div></div>` : `<div class="pod p${place}" id="pod${place}"></div>`;
     const stats = this.qStats.filter(Boolean), acc = stats.length ? stats.reduce((a, s) => a + s.pct, 0) / stats.length : 0;
     const hardest = stats.slice().sort((a, b) => a.pct - b.pct)[0];
     this.frame(`<main class="podium-wrap">
@@ -2214,8 +2290,9 @@ const Host = {
       <div class="podium">${pod(top[0], 2)}${pod(top[1], 1)}${pod(top[2], 3)}</div>
       ${r.length > 3 ? `<div class="rest">${r.slice(3, 20).map((p, i) => `<span>${i + 4}. <b dir="auto">${esc(p.name)}</b> ${fmtN(p.score)}</span>`).join('')}</div>` : ''}
       <div class="stats"><div class="stat"><b>${Math.round(acc * 100)}%</b><span>class accuracy</span></div><div class="stat"><b>${this.qPlayed}</b><span>questions played</span></div>${hardest ? `<div class="stat"><b>${Math.round(hardest.pct * 100)}%</b><span>on the toughest: “${esc(hardest.text.replace(/___/g, '…'))}”</span></div>` : ''}</div>
-      ${this.reviewSection()}
-    </main>`, `<button class="btn ghost" data-act="h-new">New game</button><span class="spacer"></span><button class="btn xl" data-act="h-again">${ICON.play} Play again</button>`);
+      ${reviewCta(this.reviewCount(), this.qPlayed, 'h-review')}
+    </main>`, `<button class="btn ghost" data-act="h-new">New game</button><span class="spacer"></span>${this.reviewCount() ? `<button class="btn ghost" data-act="h-again">${ICON.play} Play again</button><button class="btn xl" data-act="h-review">${ICON.bulb} Review answers</button>` : `<button class="btn xl" data-act="h-again">${ICON.play} Play again</button>`}`);
+    if (quiet) return;
     Sound.play('drum');
     const show = (id, d) => this.podT.push(setTimeout(() => { const el = $('#pod' + id); if (el) el.classList.add('show'); }, d));
     show(3, 700); show(2, 1500); show(1, 2500);
@@ -2231,6 +2308,9 @@ Actions['h-skip'] = () => Host.skip();
 Actions['h-reveal'] = () => Host.reveal();
 Actions['h-next'] = () => Host.primary();
 Actions['h-again'] = () => Host.backToLobby();
+Actions['h-review'] = () => Host.renderReview();
+Actions['h-newcode'] = el => Host.newCode(el);
+Actions['h-podium'] = () => Host.renderPodium(true);
 Actions['h-new'] = () => { Host.stop(); Host.setup(); };
 Actions['h-sound'] = el => { Sound.ensure(); Sound.on = !Sound.on; Sound.music = Sound.on; Host.settings.sound = Sound.on; if (Sound.on && Host.phase !== 'podium') Music.start(); el.innerHTML = Sound.on ? ICON.soundOn : ICON.soundOff; el.setAttribute('aria-label', Sound.on ? 'Turn sound off' : 'Turn sound on'); };
 Actions['h-full'] = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else { const p = document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); if (p && p.catch) p.catch(() => toast('Full screen isn’t available here.', '#7FB2FF')); } } catch (e) {} };
@@ -2249,7 +2329,24 @@ const Player = {
   active: false, net: null, code: '', pid: null, tok: null, name: '', av: null, pub: null, me: null, hs: null, seq: 0,
   view: '', lastHost: 0, deadline: 0, raf: 0, loopT: 0, pending: null, pendingUse: null, pendingPick: null, localAns: null, tab: 's', glitchT: 0, scrT: 0, joined: false, waitPub: null,
 
-  stop() { if (!this.active) return; this.active = false; cancelAnimationFrame(this.raf); clearInterval(this.loopT); clearTimeout(this.waitPub); try { this.net && this.net.leave(); } catch (e) {} this.endGlitch(); },
+  waitForHost(code) {
+    this.view = 'waitingHost';
+    app.innerHTML = `<div class="pwrap"><button class="link-back" data-act="p-cancel-wait">${ICON.back.replace('<svg', '<svg width="18" height="18"')} Use a different code</button><div class="center">
+      <div class="spot"><span class="avw bob">${avatarSVG(this.av)}</span></div>
+      <h1 class="bigtitle">Waiting for the host</h1>
+      <p class="sub">Game <b style="color:#fff">${esc(code)}</b> hasn\u2019t opened yet. Keep this page open: you\u2019ll go straight in as soon as the host opens the lobby.</p>
+      <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div></div>`;
+    clearInterval(this.hostWaitT);
+    const probe = () => { try { this.net.toHost(this.pid, { t: 'probe' }); } catch (e) {} };
+    this.hostWaitT = setInterval(probe, 2500); probe();
+    this.gotPub = () => {
+      if (!this.pub || this.pub.phase === 'closed') return;
+      clearInterval(this.hostWaitT); this.gotPub = null;
+      if (this.active) { Sound.play('join'); vibrate(60); this.renderCreate(); }
+    };
+  },
+  stop() { if (!this.active) return; this.active = false; clearInterval(this.hostWaitT); this.gotPub = null; cancelAnimationFrame(this.raf); clearInterval(this.loopT); clearTimeout(this.waitPub); try { this.net && this.net.leave(); } catch (e) {} this.endGlitch(); },
   start(prefill) {
     Host.stop(); Game.clear(); Game.phase = 'off'; this.stop(); this.active = true; this.joined = false; this.pub = null; this.me = null; this.hs = null; this.seq = 0; this.view = '';
     const saved = store.get('ce-player') || {};
@@ -2287,11 +2384,10 @@ const Player = {
     const probe = () => net.toHost(this.pid, { t: 'probe' });
     probe(); const pt = setInterval(probe, 1500);
     clearTimeout(this.waitPub);
-    await new Promise(res => { this.gotPub = res; this.waitPub = setTimeout(res, 10000); });
+    await new Promise(res => { this.gotPub = res; this.waitPub = setTimeout(res, 6000); });
     clearInterval(pt); clearTimeout(this.waitPub); this.gotPub = null;
     if (!this.active) return;
-    if (!this.pub) { fail(`No game found with the code ${code}. Check the big screen and try again.`); return; }
-    if (this.pub.phase === 'closed') { fail('That game has ended. Ask the host for the new code.'); return; }
+    if (!this.pub || this.pub.phase === 'closed') { this.waitForHost(code); return; }
     this.renderCreate();
   },
   renderCreate() {
@@ -2521,15 +2617,16 @@ const Player = {
     const m = this.me, st = m.stats || { correct: 0, total: 0, best: 0 };
     const mc = m.rank === 1 ? '#FFC42E' : m.rank === 2 ? '#DDE3F0' : m.rank === 3 ? '#F09A5B' : '#fff';
     const title = m.rank === 1 ? 'You won!' : m.rank <= 3 ? 'On the podium!' : 'Great game!';
-    app.innerHTML = `<div class="pwrap">${this.ptop()}<div class="center">
-      <div class="spot"><span class="avw bob">${avatarSVG(m.av)}</span></div>
-      <div class="medal" style="--mc:${mc}">${m.rank}</div>
-      <h1 class="bigtitle">${title}</h1>
-      <p class="sub">You finished ${ordinal(m.rank)} of ${m.n} with <b style="color:#fff">${fmtN(m.score)}</b> points.</p>
-      <div class="lines"><div><span>Correct answers</span><b>${st.correct} of ${st.total}</b></div><div><span>Best streak</span><b>${st.best}</b></div></div>
-      ${m.review ? (m.review.length ? `<section class="review"><h3>Review your mistakes</h3><p class="sub">Here is what to remember for next time.</p>${m.review.map(it => reviewCardHTML(it)).join('')}</section>` : `<p class="earn yes">${ICON.check}Perfect game: no mistakes to review!</p>`) : ''}
-      <p class="sub">Stay here. If the host starts another round, you're already in.</p>
-    </div></div>`;
+    const rv = m.review;
+    const review = !rv ? `<p class="sub">Loading your answer review\u2026</p>`
+      : rv.length ? `<section class="review"><h3>Review your mistakes</h3><p class="sub">${rv.length} question${rv.length > 1 ? 's' : ''} to learn from, with the right answer and why:</p><div class="rv-list">${rv.map(it => reviewCardHTML(it)).join('')}</div></section>`
+      : `<p class="earn yes">${ICON.check}Perfect game: no mistakes to review!</p>`;
+    app.innerHTML = `<div class="pwrap">${this.ptop()}
+      <div class="final-head"><div class="medal sm" style="--mc:${mc}">${m.rank}</div><div><h1 class="bigtitle sm">${title}</h1><p class="sub">${ordinal(m.rank)} of ${m.n} \u00b7 <b style="color:#fff">${fmtN(m.score)}</b> points \u00b7 ${st.correct} of ${st.total} correct \u00b7 best streak ${st.best}</p></div></div>
+      ${review}
+      <p class="sub small" style="text-align:center">Stay here. If the host starts another round, you're already in.</p>
+    </div>`;
+    window.scrollTo(0, 0);
     if (m.rank <= 3) Confetti.burst(120);
   },
   renderEnd(title, text) {
@@ -2553,6 +2650,7 @@ const Player = {
     this.pendingUse = { qi: s.qi, pw: id }; this.send({ t: 'use', qi: s.qi, pw: id }); Sound.play('power'); vibrate(40); this.update();
   },
 };
+Actions['p-cancel-wait'] = () => { clearInterval(Player.hostWaitT); Player.gotPub = null; Player.start(''); };
 Actions['p-find'] = () => { const i = $('#codeIn'); if (i) Player.find(i.value); };
 Actions['p-join'] = () => Player.join();
 Actions['p-randname'] = () => { const n = randomName(); Player.name = n; const i = $('#nameIn'); if (i) i.value = n; Sound.play('tap'); };
