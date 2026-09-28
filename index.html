@@ -1,0 +1,2407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Clause &amp; Effect</title>
+<meta name="description" content="A live conjunctions quiz battle for Grade 10: host on a big screen, join from phones, build a character and grab power-ups.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&amp;family=Nunito:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800&amp;display=swap">
+<style>
+:root{
+  color-scheme: dark;
+  --stage:#15113A; --stage-2:#211B55; --stage-3:#2D2572; --line:#3B3290; --deep:#0B0826;
+  --text:#FFFFFF; --muted:#CFC9F5; --faint:#9D95D6;
+  --ink:#17132F; --ink-2:#4B4670; --paper:#FFFFFF;
+  --sun:#FFC42E; --sun-deep:#D69A00; --pink:#FF5FA8; --pink-deep:#C93D80; --mint:#3DDC97; --ice:#8BE6FF;
+  --a:#D8293F; --b:#1F6FEB; --c:#FFC21A; --d:#0A7F4F;
+  --good:#22D185; --bad:#FF5566;
+  --font-display:'Lilita One','Arial Rounded MT Bold','Trebuchet MS',system-ui,sans-serif;
+  --font-body:'Nunito','Segoe UI',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--stage);color:var(--text);font-family:var(--font-body);font-weight:700;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3{text-wrap:balance}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- stage backdrop ---------- */
+.bg-rays{position:fixed;left:50%;top:42%;width:280vmax;height:280vmax;margin:-140vmax 0 0 -140vmax;background:repeating-conic-gradient(rgba(255,255,255,.035) 0deg 7.5deg,rgba(255,255,255,0) 7.5deg 15deg);animation:spin 180s linear infinite;pointer-events:none;z-index:0}
+.bg-glow{position:fixed;inset:0;background:radial-gradient(70vmax 50vmax at 50% 38%,rgba(139,92,255,.32),rgba(21,17,58,0) 70%);pointer-events:none;z-index:0}
+#bgfx,#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+#bgfx{z-index:0}
+#confetti{z-index:60}
+#app{position:relative;z-index:1;min-height:100%;display:flex;flex-direction:column}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-7px) rotate(2deg)}}
+@keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}
+@keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes wob{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(8deg) scale(1.06)}}
+@keyframes jump{0%,100%{transform:translateY(0)}30%{transform:translateY(-26px) rotate(-8deg)}60%{transform:translateY(0) rotate(4deg)}}
+@keyframes shake{0%,100%{transform:none}20%{transform:translate(-6px,3px) skewX(4deg)}40%{transform:translate(5px,-4px) skewX(-6deg)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-2px) skewX(3deg)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes countpop{0%{transform:scale(2.4);opacity:0}25%{transform:scale(1);opacity:1}85%{opacity:1}100%{transform:scale(.7);opacity:0}}
+@keyframes flipin{from{transform:perspective(600px) rotateY(80deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes rgb{0%,100%{text-shadow:2px 0 #ff2d6f,-2px 0 #2de2ff}50%{text-shadow:-3px 1px #ff2d6f,3px -1px #2de2ff}}
+
+/* ---------- shared bits ---------- */
+.btn{font-family:var(--font-display);font-weight:400;font-size:22px;letter-spacing:.02em;border:0;border-radius:16px;padding:14px 26px;color:var(--ink);background:var(--sun);box-shadow:0 6px 0 var(--sun-deep);transition:transform .08s,box-shadow .08s,filter .15s;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px}
+.btn:hover{filter:brightness(1.06)}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--sun-deep)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn.ghost{background:var(--stage-3);color:#fff;box-shadow:0 6px 0 #150F4A}
+.btn.ghost:active{box-shadow:0 2px 0 #150F4A}
+.btn.pink{background:var(--pink);box-shadow:0 6px 0 var(--pink-deep)}
+.btn.xl{font-size:28px;padding:18px 34px;min-height:64px}
+.btn.full{width:100%}
+.btn svg{width:22px;height:22px;flex:none}
+:focus-visible{outline:4px solid #fff;outline-offset:3px}
+.icon-btn{width:44px;height:44px;border-radius:12px;border:0;background:rgba(255,255,255,.1);color:#fff;display:grid;place-items:center}
+.icon-btn:hover{background:rgba(255,255,255,.18)}
+.icon-btn svg{width:22px;height:22px}
+.icon-btn.warn{background:rgba(255,85,102,.2)}
+.icon-btn.warn.armed{background:var(--bad)}
+.link-back{align-self:flex-start;border:0;background:none;color:var(--muted);font-weight:800;font-size:16px;padding:10px 0;display:inline-flex;gap:6px;align-items:center}
+.link-back:hover{color:#fff}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;color:var(--faint);margin:0}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:5px 12px;font-size:14px;font-weight:900;background:var(--cc,#fff);color:var(--ink);white-space:nowrap}
+.blank{display:inline-block;width:3.2em;height:.2em;border-radius:4px;background:currentColor;vertical-align:.05em;margin:0 .15em;opacity:.9}
+.av{display:block;width:100%;height:auto;overflow:visible}
+.bob{animation:bob 2.6s ease-in-out infinite}
+.toasts{position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);right:14px;left:14px;z-index:70;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none}
+.toast{background:#fff;color:var(--ink);border-radius:14px;padding:10px 16px;font-weight:900;box-shadow:0 6px 0 rgba(0,0,0,.25);display:flex;gap:10px;align-items:center;animation:rise .25s ease-out;max-width:min(420px,100%)}
+.toast .ti{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none;background:var(--tc,var(--sun))}
+.toast .ti svg{width:18px;height:18px}
+.netbar{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);z-index:65;background:var(--bad);color:#fff;border-radius:99px;padding:8px 16px;font-weight:900;font-size:14px;box-shadow:0 5px 0 rgba(0,0,0,.3)}
+
+/* ---------- logo ---------- */
+.logo{font-family:var(--font-display);font-weight:400;line-height:.92;margin:0;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;column-gap:.12em;font-size:clamp(54px,11vw,138px);color:#fff;text-shadow:0 .06em 0 var(--deep)}
+.logo .amp{color:var(--sun);font-size:1.3em;display:inline-block;animation:wob 3.2s ease-in-out infinite;text-shadow:0 .05em 0 #8F5F00}
+.mini-logo{font-family:var(--font-display);font-size:24px;letter-spacing:.01em;white-space:nowrap}
+.mini-logo b{color:var(--sun);font-weight:400;margin:0 2px}
+
+/* ---------- home ---------- */
+.home{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding-block:36px 44px;padding-inline:16px;text-align:center}
+.tagline{margin:0;font-size:clamp(17px,2.3vw,23px);color:var(--muted);font-weight:800}
+.tagline b{color:#fff}
+.parade{display:flex;justify-content:center;gap:clamp(4px,1.5vw,18px);width:min(720px,100%)}
+.parade .pa{width:clamp(52px,11vw,96px)}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;width:min(780px,100%)}
+.choice{border:0;border-radius:26px;padding:22px 22px 24px;display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:center;text-align:left;color:var(--ink);box-shadow:0 8px 0 var(--sd);transition:transform .1s,box-shadow .1s}
+.choice:active{transform:translateY(5px);box-shadow:0 3px 0 var(--sd)}
+.choice .ci{grid-row:span 2;width:62px;height:62px;border-radius:18px;background:rgba(23,19,47,.12);display:grid;place-items:center}
+.choice .ci svg{width:34px;height:34px}
+.choice b{font-family:var(--font-display);font-weight:400;font-size:clamp(26px,3vw,34px);line-height:1}
+.choice small{font-size:15px;font-weight:800;opacity:.8}
+.choices.three{grid-template-columns:repeat(3,minmax(0,1fr));width:min(1100px,100%)}
+.choices.one{grid-template-columns:minmax(0,1fr);width:min(520px,100%)}
+.choices.three .choice{grid-template-columns:1fr;justify-items:start;gap:8px}
+.choices.three .choice .ci{grid-row:auto}
+.choice.c-local{background:var(--mint);--sd:#17A56B}
+.choice.c-host{background:var(--sun);--sd:var(--sun-deep)}
+.choice.c-join{background:var(--pink);--sd:var(--pink-deep)}
+.how{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;counter-reset:how}
+.how li{counter-increment:how;background:rgba(255,255,255,.08);border-radius:99px;padding:8px 16px 8px 8px;font-weight:800;color:var(--muted);display:flex;align-items:center;gap:10px;font-size:15px}
+.how li::before{content:counter(how);width:28px;height:28px;border-radius:50%;background:#fff;color:var(--ink);display:grid;place-items:center;font-family:var(--font-display);font-size:16px}
+.netnote{display:inline-flex;align-items:center;gap:10px;font-size:14px;color:var(--faint);font-weight:800;max-width:640px;text-align:left}
+.netnote .dot{width:10px;height:10px;border-radius:50%;background:var(--faint);flex:none}
+.netnote.room .dot,.netnote.peer .dot{background:var(--good);box-shadow:0 0 0 4px rgba(34,209,133,.2)}
+.netnote.local .dot{background:var(--sun)}
+
+/* ---------- setup ---------- */
+.screen{flex:1;display:flex;flex-direction:column;padding-inline:clamp(16px,3vw,44px)}
+.setup{align-items:center;padding-block:18px 40px;gap:18px}
+.setup > *{width:min(760px,100%)}
+.setup-head{text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}
+.setup-head h2{font-family:var(--font-display);font-weight:400;font-size:clamp(34px,5vw,52px);margin:0;line-height:1}
+.setup-head p{margin:0;color:var(--muted)}
+.panel{background:var(--stage-2);border:3px solid var(--line);border-radius:28px;padding:clamp(18px,3vw,30px);box-shadow:0 10px 0 rgba(0,0,0,.25)}
+.setup-form{display:flex;flex-direction:column;gap:22px}
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+legend{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;color:var(--faint);padding:0;margin-bottom:10px}
+.seg{display:flex;flex-wrap:wrap;gap:10px}
+.seg label{position:relative}
+.seg input,.chipset input,.switch input{position:absolute;opacity:0;width:1px;height:1px}
+.seg span{display:inline-flex;align-items:center;justify-content:center;min-width:76px;min-height:48px;padding:0 18px;border-radius:14px;background:var(--stage-3);font-family:var(--font-display);font-size:22px;border:3px solid transparent}
+.seg input:checked + span{background:#fff;color:var(--ink);border-color:var(--sun);box-shadow:0 4px 0 var(--sun-deep)}
+.seg input:focus-visible + span,.chipset input:focus-visible + span,.switch input:focus-visible + .sw{outline:4px solid #fff;outline-offset:2px}
+.chipset{display:flex;flex-wrap:wrap;gap:10px}
+.chipset span{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 16px;border-radius:99px;background:var(--stage-3);border:3px solid var(--stage-3);font-weight:900;color:var(--muted)}
+.chipset span::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--cc);opacity:.45}
+.chipset span em{font-style:normal;font-size:13px;opacity:.7}
+.chipset input:checked + span{border-color:var(--cc);color:#fff;background:rgba(255,255,255,.06)}
+.chipset input:checked + span::before{opacity:1}
+.toggles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.switch{display:flex;align-items:center;gap:14px;background:var(--stage-3);border-radius:18px;padding:14px 16px;cursor:pointer}
+.switch .sw{width:54px;height:32px;border-radius:99px;background:#15104A;position:relative;flex:none;transition:background .15s}
+.switch .sw::after{content:"";position:absolute;left:4px;top:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch input:checked + .sw{background:var(--good)}
+.switch input:checked + .sw::after{transform:translateX(22px)}
+.switch b{display:block;font-weight:900}
+.switch small{display:block;color:var(--faint);font-size:13px}
+.form-err{color:var(--bad);font-weight:900;margin:0;min-height:1.4em}
+
+/* ---------- host frame ---------- */
+.host{min-height:100%;flex:1;display:flex;flex-direction:column}
+.hbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px;flex-wrap:wrap}
+.hb-brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.code-chip{background:#fff;color:var(--ink);border-radius:12px;padding:6px 12px;font-weight:900;font-size:15px}
+.code-chip b{font-family:var(--font-display);font-weight:400;font-size:20px;letter-spacing:.12em;margin-left:4px}
+.hb-mid{flex:1;display:flex;justify-content:center;min-width:0}
+.hb-tools{display:flex;gap:8px}
+.qprog{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;max-width:100%}
+.qprog i{width:clamp(8px,1.4vw,18px);height:8px;border-radius:99px;background:rgba(255,255,255,.18)}
+.qprog i.done{background:var(--sun)}
+.qprog i.now{background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.25)}
+.hfoot{display:flex;justify-content:flex-end;align-items:center;gap:14px;padding-block:16px 22px;flex-wrap:wrap}
+.hfoot .spacer{flex:1}
+.hfoot .hint{color:var(--faint);font-weight:800;font-size:14px}
+.hfoot kbd{background:rgba(255,255,255,.12);border-radius:6px;padding:1px 7px;font-family:inherit;font-weight:900;color:#fff}
+
+/* lobby */
+.lobby{flex:1;display:grid;grid-template-columns:minmax(280px,380px) minmax(0,1fr);gap:clamp(16px,2.5vw,32px);align-items:start}
+.join-card{background:var(--sun);color:var(--ink);border-radius:28px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 0 var(--sun-deep);text-align:center}
+.join-card .eyebrow{color:rgba(23,19,47,.65)}
+.code-tiles{display:flex;justify-content:center;gap:10px}
+.code-tiles span{width:clamp(54px,6vw,76px);aspect-ratio:4/5;max-width:100%;border-radius:16px;background:#fff;display:grid;place-items:center;font-family:var(--font-display);font-size:clamp(42px,5vw,62px);color:var(--ink);box-shadow:0 6px 0 rgba(23,19,47,.25);transform:rotate(var(--r))}
+.join-how{font-weight:800;font-size:16px;line-height:1.45;display:flex;flex-direction:column;gap:6px}
+.join-how .url{background:rgba(23,19,47,.1);border-radius:10px;padding:8px 10px;font-weight:900;word-break:break-all;font-size:15px}
+.join-how .copy{align-self:center;border:0;border-radius:10px;background:var(--ink);color:#fff;font-weight:900;padding:8px 14px;min-height:40px}
+.qr{background:#fff;border-radius:18px;padding:10px;align-self:center;width:min(220px,100%)}
+.qr svg{display:block;width:100%;height:auto}
+.lobby-players{display:flex;flex-direction:column;gap:14px;min-width:0}
+.lp-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.lp-head h2{font-family:var(--font-display);font-weight:400;font-size:clamp(30px,3.6vw,44px);margin:0;line-height:1}
+.net-chip{font-size:13px;font-weight:900;border-radius:99px;padding:6px 12px;background:rgba(255,255,255,.1);color:var(--muted)}
+.pcloud{display:flex;flex-wrap:wrap;gap:14px 10px;align-content:flex-start;min-height:200px}
+.pl{position:relative;width:108px;display:flex;flex-direction:column;align-items:center;gap:4px;animation:pop .45s cubic-bezier(.3,1.6,.5,1) both}
+.pl .avw{width:88px}
+.pl .avw.jump{animation:jump .7s ease-out}
+.pl .nm{max-width:108px;background:#fff;color:var(--ink);border-radius:99px;padding:3px 10px;font-weight:900;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl.away{opacity:.45}
+.pl .kick{position:absolute;top:0;right:4px;width:30px;height:30px;border-radius:50%;border:0;background:var(--bad);color:#fff;display:grid;place-items:center;opacity:0;transition:opacity .15s}
+.pl:hover .kick,.pl .kick:focus-visible{opacity:1}
+.pl .kick svg{width:14px;height:14px}
+.botbadge{position:absolute;top:2px;left:6px;background:var(--ink);color:var(--mint);font-size:11px;font-weight:900;border-radius:6px;padding:1px 6px;letter-spacing:.05em}
+.empty{border:3px dashed var(--line);border-radius:24px;padding:34px 20px;text-align:center;color:var(--faint);font-weight:800;display:flex;flex-direction:column;gap:6px;align-items:center;width:100%}
+.empty b{color:#fff;font-size:20px}
+
+/* intro */
+.intro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
+.intro h2{font-family:var(--font-display);font-weight:400;font-size:clamp(56px,10vw,130px);line-height:.9;margin:0;animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+.intro .of{font-size:clamp(20px,2.5vw,28px);color:var(--muted);font-weight:900}
+.countdown{width:clamp(110px,14vw,170px);aspect-ratio:1;max-width:100%;border-radius:50%;background:#fff;color:var(--ink);display:grid;place-items:center;font-family:var(--font-display);font-size:clamp(64px,8vw,100px);box-shadow:0 10px 0 rgba(0,0,0,.3)}
+.countdown span{animation:countpop 1s ease-out both}
+.countdown.still span{animation:pulse 1.2s ease-in-out infinite;display:grid;place-items:center}
+.feed-col{display:flex;flex-direction:column;gap:8px;align-items:center;min-width:0}
+
+/* question */
+.hq{flex:1;display:flex;flex-direction:column;gap:clamp(12px,2vh,22px);min-height:0}
+.hq-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hq-num{font-weight:900;color:var(--muted)}
+.hq-card{background:#fff;color:var(--ink);border-radius:28px;padding:clamp(20px,3.2vw,40px);box-shadow:0 10px 0 rgba(0,0,0,.28);text-align:center;animation:rise .35s ease-out}
+.hq-text{margin:0;font-family:var(--font-body);font-weight:900;font-size:clamp(26px,3.8vw,54px);line-height:1.18}
+.hq-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px}
+.ring{position:relative;width:clamp(86px,9vw,120px);aspect-ratio:1;max-width:100%}
+.ring svg{width:100%;height:100%;display:block}
+.ring .trk{fill:none;stroke:rgba(255,255,255,.14);stroke-width:10}
+.ring .arc{fill:none;stroke:var(--sun);stroke-width:10;stroke-linecap:round;transition:stroke .2s}
+.ring.low .arc{stroke:var(--bad)}
+.ring.low{animation:pulse .5s ease-in-out infinite}
+.ring span{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--font-display);font-size:clamp(34px,3.6vw,48px)}
+.answered{text-align:center;display:flex;flex-direction:column;align-items:center;min-width:90px}
+.answered b{font-family:var(--font-display);font-weight:400;font-size:clamp(40px,4vw,56px);line-height:1}
+.answered span{color:var(--muted);font-weight:900;font-size:14px}
+.feed{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:40px}
+.feed .fi{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border-radius:99px;padding:5px 12px 5px 5px;font-weight:900;font-size:15px;animation:pop .35s ease-out both}
+.feed .fi i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--pc);color:var(--ink)}
+.feed .fi i svg{width:16px;height:16px}
+.pp-banner{background:var(--sun);color:var(--ink);border-radius:16px;padding:10px 18px;font-weight:900;display:flex;gap:10px;align-items:center;justify-content:center;animation:pop .4s ease-out both}
+.pp-banner svg{width:22px;height:22px}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,1.4vw,18px)}
+.tile{position:relative;display:flex;align-items:center;gap:16px;min-height:clamp(74px,11vh,120px);padding:14px 20px;border-radius:22px;color:#fff;font-weight:900;font-size:clamp(20px,2.5vw,34px);line-height:1.2;box-shadow:0 7px 0 rgba(0,0,0,.28);animation:rise .4s ease-out both;transition:opacity .3s,transform .3s,filter .3s}
+.tiles.long .tile{font-size:clamp(17px,1.8vw,26px)}
+.tile:nth-child(2){animation-delay:.06s}.tile:nth-child(3){animation-delay:.12s}.tile:nth-child(4){animation-delay:.18s}
+.tile .let{flex:none;width:clamp(42px,4vw,56px);aspect-ratio:1;border-radius:14px;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--font-display);font-weight:400;font-size:.95em}
+.tile .tx{min-width:0;overflow-wrap:anywhere}
+.t0{background:var(--a)}.t1{background:var(--b)}.t2{background:var(--c);color:var(--ink)}.t3{background:var(--d)}
+.t2 .let{background:rgba(23,19,47,.14)}
+.tile .cnt{margin-left:auto;display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:400;font-size:.95em;flex:none}
+.tile.dim{opacity:.3;filter:saturate(.5);transform:scale(.97)}
+.tile.right{transform:scale(1.03);box-shadow:0 0 0 5px #fff,0 9px 0 rgba(0,0,0,.3)}
+.tile .ok{width:36px;height:36px;border-radius:50%;background:#fff;color:var(--d);display:grid;place-items:center}
+.tile .ok svg{width:22px;height:22px}
+.why{background:var(--stage-2);border:3px solid var(--line);border-radius:22px;padding:16px 20px;display:flex;gap:14px;align-items:flex-start;font-size:clamp(17px,1.8vw,22px);animation:rise .4s .2s ease-out both}
+.why b{color:var(--sun)}
+.why .wi{flex:none;width:40px;height:40px;border-radius:12px;background:var(--sun);color:var(--ink);display:grid;place-items:center}
+.why .wi svg{width:22px;height:22px}
+.score-line{font-weight:900;color:var(--muted);font-size:18px;text-align:center}
+.score-line b{color:#fff}
+
+/* board */
+.boardwrap{flex:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,300px);gap:clamp(16px,2.5vw,32px);align-items:start}
+.board-title{font-family:var(--font-display);font-weight:400;font-size:clamp(36px,4.6vw,60px);margin:0 0 14px;line-height:1}
+.board{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.row{display:grid;grid-template-columns:48px 60px minmax(0,1fr) auto auto;align-items:center;gap:14px;background:var(--stage-2);border:3px solid var(--line);border-radius:20px;padding:8px 18px 8px 10px;animation:rise .4s ease-out both}
+.row.r1{border-color:#FFC42E;background:#2B2362}.row.r2{border-color:#C9D3E6}.row.r3{border-color:#E08A4B}
+.row .rk{font-family:var(--font-display);font-size:30px;text-align:center}
+.row .rav{width:56px}
+.row .rn{font-weight:900;font-size:clamp(18px,1.8vw,24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:8px;min-width:0}
+.row .rn span{overflow:hidden;text-overflow:ellipsis}
+.row .mv{font-size:13px;font-weight:900;color:var(--good);flex:none}
+.row .mv.down{color:var(--bad)}
+.row .gain{font-weight:900;color:var(--good);font-size:16px;white-space:nowrap}
+.row .gain.neg{color:var(--bad)}
+.row .sc{font-family:var(--font-display);font-size:clamp(24px,2.4vw,32px);font-variant-numeric:tabular-nums;min-width:90px;text-align:right}
+.flame{display:inline-flex;align-items:center;gap:2px;color:#FF8A3D;font-weight:900;font-size:14px;flex:none}
+.flame svg{width:16px;height:16px}
+.side-card{background:var(--stage-2);border:3px solid var(--line);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.side-card h3{margin:0;font-family:var(--font-display);font-weight:400;font-size:26px;line-height:1.1}
+.side-card p{margin:0;color:var(--muted)}
+.meter{height:14px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--good);border-radius:99px;transition:width .3s}
+.pw-mini{display:flex;flex-wrap:wrap;gap:6px}
+.pw-mini span{width:34px;height:34px;border-radius:10px;background:var(--pc);color:var(--ink);display:grid;place-items:center}
+.pw-mini span svg{width:18px;height:18px}
+
+/* podium */
+.podium-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:22px;padding-top:8px}
+.podium-title{font-family:var(--font-display);font-weight:400;font-size:clamp(40px,6vw,76px);margin:0;line-height:1;text-align:center}
+.podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:clamp(8px,2vw,24px);width:min(900px,100%)}
+.pod{display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;transform:translateY(40px);transition:opacity .5s,transform .6s cubic-bezier(.3,1.4,.5,1)}
+.pod.show{opacity:1;transform:none}
+.pod .pav{width:min(120px,78%)}
+.pod .crown{width:min(58px,40%);display:block;margin-bottom:-14px;animation:bob 2.4s ease-in-out infinite}
+.pod .pname{font-weight:900;font-size:clamp(16px,2vw,24px);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pod .pscore{font-family:var(--font-display);font-size:clamp(20px,2.4vw,30px);color:var(--sun);font-variant-numeric:tabular-nums}
+.pod .block{width:100%;border-radius:20px 20px 0 0;display:grid;place-items:start center;padding-top:12px;font-family:var(--font-display);font-size:clamp(40px,6vw,76px);color:var(--ink);box-shadow:inset 0 -12px 0 rgba(0,0,0,.12)}
+.pod.p1 .block{height:clamp(120px,19vh,200px);background:var(--sun)}
+.pod.p2 .block{height:clamp(90px,13vh,146px);background:#DDE3F0}
+.pod.p3 .block{height:clamp(64px,9vh,104px);background:#F09A5B}
+.rest{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:min(900px,100%)}
+.rest span{background:var(--stage-2);border-radius:99px;padding:6px 14px;font-weight:900;color:var(--muted)}
+.rest span b{color:#fff}
+.stats{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.stat{background:var(--stage-2);border:3px solid var(--line);border-radius:20px;padding:12px 18px;min-width:180px;text-align:center}
+.stat b{display:block;font-family:var(--font-display);font-weight:400;font-size:32px;color:var(--sun)}
+.stat span{color:var(--muted);font-weight:800;font-size:14px}
+
+/* ---------- player ---------- */
+.pwrap{width:min(560px,100%);margin:0 auto;flex:1;display:flex;flex-direction:column;gap:16px;padding-block:14px 26px;padding-inline:16px}
+.ptop{display:flex;align-items:center;gap:10px;min-height:48px}
+.ptop .me{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+.ptop .me .avw{width:42px;flex:none}
+.ptop .me b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ptop .pts{font-family:var(--font-display);font-size:24px;font-variant-numeric:tabular-nums;background:rgba(255,255,255,.1);border-radius:12px;padding:4px 12px}
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center}
+.bigtitle{font-family:var(--font-display);font-weight:400;font-size:clamp(34px,9vw,52px);line-height:1;margin:0}
+.sub{margin:0;color:var(--muted);font-weight:800}
+.code-input{width:100%;text-align:center;font-family:var(--font-display);font-size:clamp(44px,13vw,64px);letter-spacing:.3em;text-indent:.3em;text-transform:uppercase;background:#fff;color:var(--ink);border:0;border-radius:22px;padding:14px 10px;box-shadow:0 7px 0 rgba(0,0,0,.28)}
+.code-input::placeholder{color:#C8C3E3}
+.text-input{width:100%;background:#fff;color:var(--ink);border:3px solid transparent;border-radius:16px;padding:12px 16px;font-size:20px;font-weight:900;min-height:56px}
+.text-input:focus{border-color:var(--sun);outline:none}
+.err{color:var(--bad);font-weight:900;margin:0;min-height:1.4em}
+.spot{width:min(200px,52vw);aspect-ratio:1;max-width:100%;border-radius:50%;background:radial-gradient(circle at 50% 60%,rgba(255,255,255,.18),rgba(255,255,255,.04) 62%,transparent 63%);display:grid;place-items:center;margin:0 auto}
+.spot .avw{width:78%}
+.name-row{display:flex;gap:10px}
+.name-row .text-input{flex:1;min-width:0}
+.dice{flex:none;width:56px;height:56px;border-radius:16px;border:0;background:var(--pink);color:var(--ink);display:grid;place-items:center;box-shadow:0 5px 0 var(--pink-deep)}
+.dice:active{transform:translateY(3px);box-shadow:0 2px 0 var(--pink-deep)}
+.dice svg{width:28px;height:28px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{flex:none;border:0;border-radius:99px;padding:8px 14px;min-height:40px;background:rgba(255,255,255,.1);color:var(--muted);font-weight:900}
+.tabs button[aria-selected="true"]{background:#fff;color:var(--ink)}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px}
+.opt{border:3px solid transparent;background:var(--stage-2);border-radius:16px;padding:6px;aspect-ratio:1;display:grid;place-items:center;max-width:100%}
+.opt[aria-pressed="true"]{border-color:var(--sun);background:var(--stage-3)}
+.opt .avw{width:100%}
+.opt.sw{padding:10px}
+.opt.sw i{width:100%;height:100%;border-radius:50%;background:var(--sc);box-shadow:inset 0 -5px 0 rgba(0,0,0,.2)}
+.opt .none{font-weight:900;color:var(--faint);font-size:13px}
+.row-btns{display:flex;gap:10px}
+.row-btns .btn{flex:1;font-size:20px;padding:12px 14px}
+.tbar{height:14px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.tbar i{display:block;height:100%;width:100%;background:var(--sun);border-radius:99px;transform-origin:left center}
+.tbar.low i{background:var(--bad)}
+.frozen .tbar i{background:var(--ice)}
+.frozen{box-shadow:inset 0 0 0 6px rgba(139,230,255,.5)}
+.pq-text{margin:0;font-weight:900;font-size:clamp(21px,5.6vw,28px);line-height:1.22;text-align:center;background:#fff;color:var(--ink);border-radius:22px;padding:18px 16px;box-shadow:0 7px 0 rgba(0,0,0,.25)}
+.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.answers.long{grid-template-columns:1fr}
+.ans{min-height:96px;border:0;border-radius:20px;padding:12px 14px;color:#fff;font-weight:900;font-size:18px;line-height:1.25;display:flex;align-items:center;gap:12px;text-align:left;box-shadow:0 6px 0 rgba(0,0,0,.3);transition:transform .08s,box-shadow .08s,opacity .2s}
+.answers.long .ans{min-height:70px}
+.ans:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+.ans .let{flex:none;width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--font-display);font-weight:400;font-size:22px}
+.ans.t2 .let{background:rgba(23,19,47,.14)}
+.ans .ans-text{min-width:0;overflow-wrap:anywhere}
+.ans:disabled{opacity:.22;filter:grayscale(.9);cursor:not-allowed;transform:none}
+.ans:disabled .ans-text{text-decoration:line-through}
+.banner{border-radius:16px;padding:10px 14px;font-weight:900;display:flex;align-items:center;gap:10px;justify-content:center;text-align:center}
+.banner svg{width:22px;height:22px;flex:none}
+.banner.good{background:var(--good);color:var(--ink)}
+.banner.sun{background:var(--sun);color:var(--ink)}
+.banner.ice{background:var(--ice);color:var(--ink)}
+.pack{background:var(--stage-2);border:3px solid var(--line);border-radius:22px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.pack-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pack-head b{font-family:var(--font-display);font-weight:400;font-size:20px}
+.pack-head span{color:var(--faint);font-size:13px;font-weight:800}
+.slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.slot{border:0;border-radius:16px;min-height:78px;padding:8px 6px;background:var(--pc,transparent);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-weight:900;font-size:13px;line-height:1.1;text-align:center;box-shadow:0 5px 0 rgba(0,0,0,.28)}
+.slot svg{width:28px;height:28px}
+.slot.empty{background:transparent;border:3px dashed var(--line);box-shadow:none;color:var(--faint);font-weight:800}
+.slot:disabled{opacity:.45;cursor:not-allowed}
+.slot:not(:disabled):not(.empty):active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.28)}
+.active-pw{display:flex;align-items:center;gap:10px;justify-content:center;background:var(--pc);color:var(--ink);border-radius:14px;padding:8px 12px;font-weight:900}
+.active-pw svg{width:20px;height:20px}
+.verdict{font-family:var(--font-display);font-weight:400;font-size:clamp(46px,14vw,74px);line-height:1;margin:0;animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+.verdict.good{color:var(--good)}.verdict.bad{color:var(--bad)}.verdict.meh{color:var(--sun)}
+.gainbig{font-family:var(--font-display);font-size:clamp(40px,11vw,60px);line-height:1}
+.lines{width:100%;background:var(--stage-2);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:6px}
+.lines div{display:flex;justify-content:space-between;gap:10px;font-weight:800;color:var(--muted)}
+.lines div b{color:#fff;font-variant-numeric:tabular-nums}
+.rankpill{background:#fff;color:var(--ink);border-radius:99px;padding:8px 18px;font-weight:900;font-size:18px}
+.cards{display:grid;gap:12px;width:100%}
+.pw-card{border:3px solid var(--pc);background:var(--stage-2);border-radius:22px;padding:14px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;align-items:center;text-align:left;color:#fff;animation:flipin .5s ease-out both;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+.pw-card:nth-child(2){animation-delay:.12s}.pw-card:nth-child(3){animation-delay:.24s}
+.pw-card:active{transform:translateY(3px)}
+.pw-card .ico{grid-row:span 3;width:64px;height:64px;border-radius:18px;background:var(--pc);color:var(--ink);display:grid;place-items:center}
+.pw-card .ico svg{width:36px;height:36px}
+.pw-card b{font-family:var(--font-display);font-weight:400;font-size:22px;line-height:1.05}
+.pw-card small{color:var(--muted);font-weight:800;font-size:14px;line-height:1.3}
+.rar{justify-self:start;font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;border-radius:6px;padding:2px 7px;color:var(--ink)}
+.rar.common{background:var(--mint)}.rar.rare{background:#7FB2FF}.rar.epic{background:var(--sun)}
+.medal{width:120px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-size:56px;color:var(--ink);background:var(--mc,#fff);box-shadow:0 8px 0 rgba(0,0,0,.3)}
+.sheet-back{position:fixed;inset:0;background:rgba(8,5,30,.6);z-index:80}
+.sheet{position:fixed;left:0;right:0;bottom:0;margin:0 auto;width:min(560px,100%);z-index:81;background:var(--stage-2);border:3px solid var(--line);border-bottom:0;border-radius:28px 28px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;animation:rise .25s ease-out}
+.sheet .pw-card{animation:none;box-shadow:none}
+.wave-btn{border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:99px;padding:10px 20px;font-weight:900;min-height:44px}
+
+/* glitch */
+body.glitching #app{animation:shake .25s linear infinite}
+body.glitching .tile .tx,body.glitching .hq-text,body.glitching .ans-text,body.glitching .pq-text{animation:rgb .18s steps(2) infinite}
+body.glitching .tiles,body.glitching .answers{filter:hue-rotate(80deg) contrast(1.2)}
+.host.shake{animation:shake .3s linear 2}
+
+/* ---------- single-device game ---------- */
+.play-btn{font-size:clamp(28px,4vw,40px);padding:20px 56px;min-height:78px;border-radius:22px}
+.sub.small{font-size:14px;color:var(--faint)}
+.setup.wide > *{width:min(1120px,100%)}
+.setup.wide .start-btn{width:auto;align-self:center;min-width:min(420px,100%)}
+.setup-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:start}
+.roster-panel{display:flex;flex-direction:column;gap:20px}
+.roster{display:flex;flex-direction:column;gap:10px}
+.rrow{display:grid;grid-template-columns:72px minmax(0,1fr) auto auto;align-items:center;gap:12px;background:var(--stage-3);border-radius:20px;padding:8px 12px 8px 8px}
+.rav-btn{border:0;background:rgba(255,255,255,.06);border-radius:16px;padding:4px;width:72px}
+.rav-btn .avw{width:100%}
+.rinfo{display:flex;flex-direction:column;min-width:0}
+.rinfo b{font-size:20px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rinfo span{font-size:13px;color:var(--faint);font-weight:800}
+.btn.sm{font-size:17px;padding:8px 14px;min-height:44px;border-radius:12px;box-shadow:0 4px 0 #150F4A}
+.add-player{border:3px dashed var(--line);background:none;border-radius:20px;min-height:64px;font-weight:900;font-size:18px;color:var(--muted)}
+.add-player:hover{border-color:var(--sun);color:#fff}
+.hint-line{margin:0;color:var(--faint);font-size:14px;font-weight:800}
+.turn-head{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px}
+.who{display:flex;align-items:center;gap:12px;min-width:0}
+.who .avw{width:clamp(52px,5vw,68px);flex:none}
+.who div{display:flex;flex-direction:column;min-width:0}
+.who b{font-family:var(--font-display);font-weight:400;font-size:clamp(24px,2.6vw,34px);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who span{color:var(--muted);font-weight:900;font-size:14px;text-transform:uppercase;letter-spacing:.08em}
+.who.big{justify-content:center}
+.who.big .avw{width:clamp(70px,8vw,96px)}
+.who-score{justify-self:end;text-align:right;display:flex;flex-direction:column}
+.who-score b{font-family:var(--font-display);font-weight:400;font-size:clamp(28px,3vw,40px);line-height:1;font-variant-numeric:tabular-nums}
+.who-score span{color:var(--muted);font-weight:900;font-size:13px}
+.ring .arc{transition:stroke-dashoffset .1s linear,stroke .2s}
+.ring.frozen .arc{stroke:var(--ice)}
+.turn.frozen .hq-card{box-shadow:0 0 0 5px var(--ice),0 10px 0 rgba(0,0,0,.28)}
+button.tile{border:0;width:100%;text-align:left;cursor:pointer;font-family:inherit;transition:transform .1s,filter .15s,opacity .2s,box-shadow .1s}
+button.tile:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-2px)}
+button.tile:active:not(:disabled){transform:translateY(4px);box-shadow:0 3px 0 rgba(0,0,0,.28)}
+button.tile:disabled{opacity:.22;filter:grayscale(.85);cursor:not-allowed;animation:none}
+button.tile:disabled .tx{text-decoration:line-through}
+.locked-tile{width:min(620px,100%);animation:pop .4s ease-out both}
+.handoff .spot{width:min(220px,50vw)}
+.tail{margin-left:auto;display:flex;align-items:center;gap:10px;flex:none}
+.pickers{display:flex;flex-wrap:wrap;gap:2px;justify-content:flex-end;max-width:180px}
+.pk{width:clamp(30px,2.6vw,40px);display:block}
+.pk .av{filter:drop-shadow(0 2px 0 rgba(0,0,0,.25))}
+.res-list{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.res{display:flex;align-items:center;gap:8px;background:var(--stage-2);border:3px solid var(--line);border-radius:99px;padding:3px 14px 3px 4px;font-weight:900}
+.res .avw{width:34px}
+.res b{font-variant-numeric:tabular-nums}
+.res.good{border-color:var(--good)}.res.good b{color:var(--good)}
+.res.bad b{color:var(--muted)}
+.res em,.cpu{font-style:normal;font-size:11px;font-weight:900;letter-spacing:.06em;background:var(--ink);color:var(--mint);border-radius:6px;padding:1px 6px}
+.draft{flex:1;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;padding-top:8px}
+.cards.three{grid-template-columns:repeat(3,minmax(0,1fr));width:min(1000px,100%)}
+.cards.three .pw-card{grid-template-columns:1fr;justify-items:center;text-align:center;padding:22px 16px}
+.cards.three .pw-card .ico{grid-row:auto;width:84px;height:84px}
+.cards.three .pw-card .ico svg{width:46px;height:46px}
+.cards.three .pw-card .rar{justify-self:center}
+.cards.three .pw-card b{font-size:26px}
+.cards.three .pw-card:hover{border-color:#fff;transform:translateY(-3px)}
+.stat.pstat{display:flex;align-items:center;gap:12px;text-align:left}
+.stat.pstat .avw{width:48px;flex:none}
+.stat.pstat b{font-family:var(--font-body);font-weight:900;font-size:18px;color:#fff}
+@media (max-width:900px){
+  .choices.three{grid-template-columns:1fr}
+  .choices.three .choice{grid-template-columns:auto 1fr;gap:4px 16px}
+  .choices.three .choice .ci{grid-row:span 2}
+  .setup-grid{grid-template-columns:1fr}
+  .cards.three{grid-template-columns:1fr}
+  .cards.three .pw-card{grid-template-columns:auto minmax(0,1fr);justify-items:start;text-align:left;padding:14px}
+  .cards.three .pw-card .ico{grid-row:span 3;width:64px;height:64px}
+  .cards.three .pw-card .ico svg{width:36px;height:36px}
+  .cards.three .pw-card .rar{justify-self:start}
+  .cards.three .pw-card b{font-size:22px}
+  .lobby,.boardwrap{grid-template-columns:1fr}
+  .hq-row{grid-template-columns:auto minmax(0,1fr) auto}
+}
+@media (max-width:620px){
+  .turn-head{grid-template-columns:minmax(0,1fr) auto}
+  .turn-head .who-score{display:none}
+  .rrow{grid-template-columns:60px minmax(0,1fr) auto auto;gap:8px}
+  .rav-btn{width:60px}
+  .pickers{max-width:110px}
+  .choices,.toggles{grid-template-columns:1fr}
+  .tiles{grid-template-columns:1fr}
+  .row{grid-template-columns:34px 44px minmax(0,1fr) auto;padding:6px 12px 6px 8px;gap:10px}
+  .row .rav{width:42px}
+  .row .gain{display:none}
+  .row .rk{font-size:22px}
+  .hfoot{justify-content:stretch}
+  .hfoot .btn{flex:1}
+  .hfoot .hint,.hfoot .spacer{display:none}
+  .stat{min-width:140px}
+}
+@media (prefers-reduced-motion:reduce){
+  .bg-rays,.logo .amp,.bob,.ring.low{animation:none}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+
+</head>
+<body>
+<div class="bg-glow" aria-hidden="true"></div>
+<div class="bg-rays" aria-hidden="true"></div>
+<canvas id="bgfx" aria-hidden="true"></canvas>
+<div id="app"></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+'use strict';
+/* =========================================================
+   Clause & Effect — a live conjunctions quiz
+   ========================================================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd = (a, b) => a + Math.random() * (b - a);
+const ri = n => Math.floor(Math.random() * n);
+const pick = a => a[ri(a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = ri(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const mkStore = name => ({
+  get(k) { try { return JSON.parse(window[name].getItem(k)); } catch (e) { return null; } },
+  set(k, v) { try { window[name].setItem(k, JSON.stringify(v)); } catch (e) {} }
+});
+const store = mkStore('localStorage'), tabStore = mkStore('sessionStorage');
+const app = document.getElementById('app');
+const ordinal = n => { const s = ['th','st','nd','rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); };
+const fmtQ = t => esc(t).replace(/___/g, '<span class="blank" role="img" aria-label="blank"></span>');
+const fmtN = n => Math.round(n).toLocaleString('en-US');
+function loadScript(src, ms = 8000) {
+  return new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = src; s.async = true;
+    const t = setTimeout(() => rej(new Error('timeout')), ms);
+    s.onload = () => { clearTimeout(t); res(); };
+    s.onerror = () => { clearTimeout(t); rej(new Error('load failed')); };
+    document.head.appendChild(s);
+  });
+}
+function vibrate(p) { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} }
+let wakeLock = null;
+async function keepAwake() { try { const fp = document.permissionsPolicy || document.featurePolicy; if (fp && fp.allowsFeature && !fp.allowsFeature('screen-wake-lock')) return; if ('wakeLock' in navigator && !wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); } } catch (e) {} }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && typeof Game !== 'undefined' && (!['home', 'setup', 'edit', 'off'].includes(Game.phase) || Host.active || Player.active)) keepAwake(); });
+
+/* ---------------- icons ---------------- */
+const I = (p, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${p}</svg>`;
+const ICON = {
+  screen: I('<rect x="2.5" y="4" width="19" height="13" rx="2.5"/><path d="M8 21h8M12 17v4"/>'),
+  phone: I('<rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M11 18h2"/>'),
+  play: I('<path d="M7 4.5v15l12-7.5z" fill="currentColor"/>'),
+  next: I('<path d="M5 12h13M13 6l6 6-6 6"/>'),
+  skip: I('<path d="M5 5l9 7-9 7z" fill="currentColor"/><path d="M19 5v14"/>'),
+  check: I('<path d="M4.5 12.5l5 5L19.5 7"/>'),
+  x: I('<path d="M6 6l12 12M18 6L6 18"/>'),
+  back: I('<path d="M19 12H5M11 6l-6 6 6 6"/>'),
+  soundOn: I('<path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>'),
+  soundOff: I('<path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 9.5l5 5M22 9.5l-5 5"/>'),
+  full: I('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),
+  stop: I('<rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/>'),
+  dice: I('<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/>'),
+  bulb: I('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'),
+  flame: I('<path d="M12 22c4 0 7-3 7-7 0-4.5-3.5-6.5-4.5-10.5-2 2-3 4-3 6.3-1.2-.8-2-2.2-2.2-3.8C6.7 9.4 5 11.8 5 15c0 4 3 7 7 7z" fill="currentColor" stroke="none"/>'),
+  hand: I('<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10.5V4a1.5 1.5 0 0 1 3 0v7M14 10.5V5.5a1.5 1.5 0 0 1 3 0V13c0 4.5-2.5 8-6.5 8S5 18 4.5 15.5L3.8 12a1.4 1.4 0 0 1 2.5-1L8 13"/>'),
+  users: I('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.8a3.3 3.3 0 0 1 0 6.4M18 14.8c1.9.7 3 2.4 3.5 5.2"/>'),
+  copy: I('<rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'),
+  bot: I('<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M9.5 17h5"/>'),
+};
+
+/* ---------------- content ---------------- */
+const CATS = {
+  coord: { name: 'Coordinating', color: '#FF8A4C' },
+  sub:   { name: 'Subordinating', color: '#7FB2FF' },
+  corr:  { name: 'Correlative', color: '#B99BFF' },
+  adv:   { name: 'Conjunctive adverbs', color: '#3DDC97' },
+  punc:  { name: 'Punctuation', color: '#FFC42E' },
+  look:  { name: 'Look-alikes', color: '#FF8CC0' },
+};
+const catChip = k => `<span class="chip" style="--cc:${CATS[k].color}">${esc(CATS[k].name)}</span>`;
+
+const QUESTIONS = [
+  {id:'c1',cat:'coord',q:'I wanted to go out, ___ it was raining.',o:['but','so','or','for'],a:0,why:'"But" joins two ideas that contrast: wanting to go out and the rain.'},
+  {id:'c2',cat:'coord',q:'She was hungry, ___ she made a sandwich.',o:['so','but','nor','yet'],a:0,why:'"So" introduces a result: she was hungry, so she made food.'},
+  {id:'c3',cat:'coord',q:'Would you like tea ___ coffee?',o:['or','nor','yet','so'],a:0,why:'"Or" offers a choice between two things.'},
+  {id:'c4',cat:'coord',q:"He doesn't eat meat, ___ does he eat fish.",o:['nor','for','but','so'],a:0,why:'"Nor" adds a second negative idea. Notice the word order after it: "nor does he".'},
+  {id:'c5',cat:'coord',q:'The test was hard, ___ everyone passed.',o:['yet','so','for','or'],a:0,why:'"Yet" means "but" and shows a surprising contrast.'},
+  {id:'c6',cat:'coord',q:'We stayed at home, ___ we were very tired.',o:['for','so','nor','or'],a:0,why:'As a conjunction, "for" means "because". It is formal and comes after a comma.'},
+  {id:'c7',cat:'coord',q:'Which word is NOT one of the FANBOYS?',o:['because','nor','yet','so'],a:0,why:'FANBOYS = for, and, nor, but, or, yet, so. "Because" is a subordinating conjunction.'},
+  {id:'s1',cat:'sub',q:'___ it was raining, we played football.',o:['Although','Because','Unless','So that'],a:0,why:'"Although" shows contrast: the rain didn’t stop the game.'},
+  {id:'s2',cat:'sub',q:"I'll call you ___ I arrive at the airport.",o:['as soon as','although','unless','whereas'],a:0,why:'"As soon as" is a time conjunction: the call comes right after you arrive.'},
+  {id:'s3',cat:'sub',q:"You won't pass ___ you study.",o:['unless','if','because','while'],a:0,why:'"Unless" means "if not": if you don’t study, you won’t pass.'},
+  {id:'s4',cat:'sub',q:'He left early ___ he could catch the train.',o:['so that','even though','unless','whereas'],a:0,why:'"So that" shows purpose: why he left early.'},
+  {id:'s5',cat:'sub',q:'Sara likes tea, ___ her brother prefers coffee.',o:['whereas','because','so that','until'],a:0,why:'"Whereas" compares two different facts.'},
+  {id:'s6',cat:'sub',q:'We waited ___ the rain stopped.',o:['until','unless','although','so that'],a:0,why:'"Until" means up to the moment something happens.'},
+  {id:'s7',cat:'sub',q:'___ he was ill, he stayed at home.',o:['Because','Although','Unless','Whereas'],a:0,why:'"Because" gives the reason he stayed at home.'},
+  {id:'s8',cat:'sub',q:'Which word is a subordinating conjunction?',o:['although','however','but','therefore'],a:0,why:'"Although" starts a dependent clause. "However" and "therefore" are adverbs, and "but" is coordinating.'},
+  {id:'r1',cat:'corr',q:'___ Ali ___ Omar was late; they both arrived on time.',o:['Neither … nor','Either … or','Both … and','Not only … but also'],a:0,why:'"Neither … nor" makes both parts negative: Ali wasn’t late and Omar wasn’t late.'},
+  {id:'r2',cat:'corr',q:'She speaks ___ English ___ French.',o:['both … and','neither … or','either … nor','both … or'],a:0,why:'Correlative pairs never mix: it’s "both … and".'},
+  {id:'r3',cat:'corr',q:'You can ___ stay here ___ come with us.',o:['either … or','either … nor','both … or','neither … or'],a:0,why:'"Either … or" gives two choices, and the two halves must match.'},
+  {id:'r4',cat:'corr',q:'He is ___ smart ___ also kind.',o:['not only … but','both … but','either … but','neither … but'],a:0,why:'The full pair is "not only … but also".'},
+  {id:'r5',cat:'corr',q:'Neither the teacher nor the students ___ ready.',o:['were','was','is','has been'],a:0,why:'With "neither … nor", the verb agrees with the nearer subject: "students", so "were".'},
+  {id:'r6',cat:'corr',q:'Either the students or the teacher ___ the key.',o:['has','have','are','were'],a:0,why:'The nearer subject is "the teacher" (singular), so "has".'},
+  {id:'r7',cat:'corr',q:'Which of these is a correlative pair?',o:['whether … or','because … so','although … but','and … also'],a:0,why:'"Whether … or" is a correlative pair. "Although … but" is a common mistake: use only one of them.'},
+  {id:'a1',cat:'adv',q:'It rained heavily; ___, the match continued.',o:['however','therefore','moreover','meanwhile'],a:0,why:'"However" shows contrast between the heavy rain and the match going on.'},
+  {id:'a2',cat:'adv',q:"She didn't study; ___, she failed the test.",o:['therefore','however','nevertheless','moreover'],a:0,why:'"Therefore" shows a result.'},
+  {id:'a3',cat:'adv',q:'The hotel was cheap; ___, it was close to the beach.',o:['moreover','however','therefore','otherwise'],a:0,why:'"Moreover" adds another good point.'},
+  {id:'a4',cat:'adv',q:"Hurry up; ___, you'll miss the bus.",o:['otherwise','moreover','therefore','nevertheless'],a:0,why:'"Otherwise" means "if not": if you don’t hurry, you’ll miss it.'},
+  {id:'a5',cat:'adv',q:'He was very tired; ___, he kept working.',o:['nevertheless','consequently','furthermore','thus'],a:0,why:'"Nevertheless" shows he did something unexpected even though he was tired.'},
+  {id:'a6',cat:'adv',q:'Which word is a conjunctive adverb?',o:['consequently','because','although','unless'],a:0,why:'"Consequently" links two full sentences. The others start dependent clauses.'},
+  {id:'p1',cat:'punc',q:'Which sentence is punctuated correctly?',o:['Although she was tired, she finished her homework.','Although she was tired she, finished her homework.','Although, she was tired she finished her homework.','Although she was tired; she finished her homework.'],a:0,why:'When the dependent clause comes first, put a comma after it.'},
+  {id:'p2',cat:'punc',q:'Which sentence is punctuated correctly?',o:['It was late; however, we kept working.','It was late, however we kept working.','It was late however, we kept working.','It was late; however we, kept working.'],a:0,why:'The pattern is: sentence ; however , sentence.'},
+  {id:'p3',cat:'punc',q:'Which sentence is punctuated correctly?',o:['I stayed at home because I was sick.','I stayed at home, because, I was sick.','I stayed at home because, I was sick.','I stayed, at home because I was sick.'],a:0,why:'When the main clause comes first, you usually don’t need a comma before "because".'},
+  {id:'p4',cat:'punc',q:'Which sentence is punctuated correctly?',o:["She loves music, but she can't sing.","She loves music but, she can't sing.","She loves, music but she can't sing.","She loves music; but, she can't sing."],a:0,why:'Put the comma before a FANBOYS word that joins two full sentences.'},
+  {id:'p5',cat:'punc',q:'What comes before "however" when it joins two sentences into one?',o:['A semicolon (;)','A comma (,)','A question mark (?)','No punctuation'],a:0,why:'Use a semicolon before "however" and a comma after it. A full stop also works.'},
+  {id:'p6',cat:'punc',q:'Which sentence is a comma splice (a mistake)?',o:['I was hungry, I ate a sandwich.','I was hungry, so I ate a sandwich.','I was hungry; I ate a sandwich.','Because I was hungry, I ate a sandwich.'],a:0,why:'A comma alone can’t join two full sentences. Add a conjunction or use a semicolon.'},
+  {id:'l1',cat:'look',q:'___ the rain, we went to the beach.',o:['Despite','Although','Even though','Though'],a:0,why:'"The rain" is a noun, so use the preposition "despite".'},
+  {id:'l2',cat:'look',q:'___ it was raining, we went to the beach.',o:['Although','Despite','In spite of','Because of'],a:0,why:'"It was raining" is a clause, so use the conjunction "although".'},
+  {id:'l3',cat:'look',q:'The match was cancelled ___ the storm.',o:['because of','because','although','so that'],a:0,why:'"The storm" is a noun, so use "because of".'},
+  {id:'l4',cat:'look',q:'The match was cancelled ___ there was a storm.',o:['because','because of','due to','despite'],a:0,why:'"There was a storm" is a clause, so use "because".'},
+  {id:'l5',cat:'look',q:'In spite of ___, he won the race.',o:['being injured','he was injured','he injured','was injured'],a:0,why:'"In spite of" is followed by a noun or an -ing form.'},
+  {id:'l6',cat:'look',q:'Which sentence is correct?',o:['Despite feeling tired, she went to the gym.','Despite she was tired, she went to the gym.','Despite of feeling tired, she went to the gym.','In spite she was tired, she went to the gym.'],a:0,why:'Use "despite" + -ing or a noun. Never say "despite of".'},
+];
+
+/* ---------------- power-ups ---------------- */
+const PW_ICON = {
+  double: `<svg viewBox="0 0 24 24" aria-hidden="true"><text x="12" y="17" text-anchor="middle" font-family="Lilita One, Arial Rounded MT Bold, sans-serif" font-size="14" fill="currentColor">2×</text></svg>`,
+  fifty: `<svg viewBox="0 0 24 24" aria-hidden="true"><text x="12" y="16.5" text-anchor="middle" font-family="Lilita One, Arial Rounded MT Bold, sans-serif" font-size="11" fill="currentColor">50/50</text></svg>`,
+  eraser: I('<path d="M3.5 16.5l9-9a2 2 0 0 1 2.8 0l3.2 3.2a2 2 0 0 1 0 2.8l-6.5 6.5H7.5z"/><path d="M9.5 10.5l5 5M13 20h7.5"/>'),
+  immunity: I('<path d="M12 3l7.5 3v6c0 4.8-3.3 7.8-7.5 9-4.2-1.2-7.5-4.2-7.5-9V6z"/><path d="M8.7 12.2l2.3 2.3 4.4-4.6"/>'),
+  freeze: I('<path d="M12 2.5v19M3.8 7.2l16.4 9.6M3.8 16.8l16.4-9.6"/><path d="M9.2 4.2L12 6l2.8-1.8M9.2 19.8L12 18l2.8 1.8"/>'),
+  saver: I('<path d="M12 22c4 0 7-3 7-7 0-4.5-3.5-6.5-4.5-10.5-2 2-3 4-3 6.3-1.2-.8-2-2.2-2.2-3.8C6.7 9.4 5 11.8 5 15c0 4 3 7 7 7z"/><path d="M9.5 15.5l1.8 1.8 3.4-3.6"/>'),
+  jeopardy: I('<rect x="3.5" y="3.5" width="11" height="11" rx="2.5"/><rect x="9.5" y="9.5" width="11" height="11" rx="2.5"/><circle cx="7" cy="7" r=".9" fill="currentColor"/><circle cx="11" cy="11" r=".9" fill="currentColor"/><circle cx="13" cy="13" r=".9" fill="currentColor"/><circle cx="17" cy="17" r=".9" fill="currentColor"/>'),
+  powerplay: I('<path d="M13.5 2.5L4.5 14h6.5l-1 7.5 9-11.5h-6.5z" fill="currentColor"/>'),
+  glitch: I('<rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M9 4l2.5 5-3 2.5 4 5.5M8 21h8"/>'),
+  gift: I('<rect x="3.5" y="8" width="17" height="4.5" rx="1"/><path d="M5 12.5V21h14v-8.5M12 8v13"/><path d="M12 8c-1.6-3.6-6-4-6-1.2C6 8 7.5 8 12 8zM12 8c1.6-3.6 6-4 6-1.2C18 8 16.5 8 12 8z"/>'),
+};
+const POWERUPS = {
+  double:    { name: 'Double Points', rarity: 'rare',   color: '#FF9A3D', desc: 'Double the points you earn on this question.' },
+  fifty:     { name: '50-50',         rarity: 'rare',   color: '#7FB2FF', desc: 'Remove two wrong answers.' },
+  eraser:    { name: 'Eraser',        rarity: 'common', color: '#FF8CC0', desc: 'Remove one wrong answer.' },
+  immunity:  { name: 'Immunity',      rarity: 'rare',   color: '#3DDC97', desc: 'Wrong answer? You get a second try.' },
+  freeze:    { name: 'Time Freeze',   rarity: 'rare',   color: '#8BE6FF', desc: 'Stop your timer and keep the full speed bonus.' },
+  saver:     { name: 'Streak Saver',  rarity: 'common', color: '#FFB27A', desc: "A wrong answer won't break your streak." },
+  jeopardy:  { name: 'Double Jeopardy', rarity: 'epic', color: '#FF6B8A', desc: 'Right: double points. Wrong: lose up to 500.' },
+  powerplay: { name: 'Power Play',    rarity: 'epic',   color: '#FFC42E', desc: 'Everyone earns +50% on this question.' },
+  glitch:    { name: 'Glitch',        rarity: 'epic',   color: '#B99BFF', desc: 'Scramble the screens of players after you and confuse the computer rivals.' },
+  gift:      { name: 'Gift',          rarity: 'common', color: '#7EE8B5', desc: 'Give 200 points to a random player and get 200 yourself.' },
+};
+function drawPowerups(frac) {
+  const w = frac >= 0.5 ? { common: 30, rare: 45, epic: 25 } : { common: 52, rare: 36, epic: 12 };
+  const ids = Object.keys(POWERUPS), out = [];
+  let guard = 0;
+  while (out.length < 3 && guard++ < 50) {
+    let r = Math.random() * 100, rar = 'common';
+    if (r >= w.common) rar = r < w.common + w.rare ? 'rare' : 'epic';
+    const pool = ids.filter(id => POWERUPS[id].rarity === rar && !out.includes(id));
+    if (pool.length) out.push(pick(pool));
+  }
+  return out;
+}
+const pwCard = (id, attrs = '', tag = 'button') => { const p = POWERUPS[id]; return `<${tag} class="pw-card" style="--pc:${p.color}" ${attrs}><span class="ico">${PW_ICON[id]}</span><span class="rar ${p.rarity}">${p.rarity}</span><b>${esc(p.name)}</b><small>${esc(p.desc)}</small></${tag}>`; };
+
+/* ---------------- avatars ---------------- */
+const INK = '#17132F';
+const AV = {
+  shapes: ['blob', 'square', 'bean', 'cloud', 'gumdrop'],
+  colors: ['#FF5A4E', '#FF8A1F', '#FFC42E', '#9BD93B', '#1FCB8A', '#19C6D8', '#2E8BFF', '#8A5CFF', '#FF5FA8', '#EDEBFF'],
+  eyes: ['dots', 'googly', 'happy', 'sleepy', 'cyclops', 'stars'],
+  mouths: ['smile', 'grin', 'oh', 'teeth', 'tongue', 'smirk'],
+  hats: ['none', 'crown', 'party', 'cap', 'antenna', 'bow', 'wizard', 'beanie', 'flower'],
+  extras: ['none', 'blush', 'glasses', 'shades', 'freckles'],
+};
+const AV_KEYS = { s: 'shapes', c: 'colors', e: 'eyes', m: 'mouths', h: 'hats', x: 'extras' };
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const t = amt < 0 ? 0 : 255, f = Math.abs(amt);
+  r = Math.round(r + (t - r) * f); g = Math.round(g + (t - g) * f); b = Math.round(b + (t - b) * f);
+  return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
+}
+const SHAPES = {
+  blob:    { top: 30, hl: [44, 48], d: 'M60 30C84 30 99 47 99 70C99 93 83 108 60 108C37 108 21 93 21 70C21 47 36 30 60 30Z' },
+  square:  { top: 32, hl: [38, 48], d: 'M44 32H76A22 22 0 0 1 98 54V86A22 22 0 0 1 76 108H44A22 22 0 0 1 22 86V54A22 22 0 0 1 44 32Z' },
+  bean:    { top: 24, hl: [44, 42], d: 'M60 24C86 24 97 52 97 76C97 97 81 108 60 108C39 108 23 97 23 76C23 52 34 24 60 24Z' },
+  cloud:   { top: 26, hl: [50, 38], d: null },
+  gumdrop: { top: 26, hl: [55, 46], d: 'M60 26C72 26 101 84 101 96C101 106 94 108 60 108C26 108 19 106 19 96C19 84 48 26 60 26Z' },
+};
+function bodyShape(k, fill) {
+  if (k === 'cloud') return `<g fill="${fill}"><circle cx="60" cy="48" r="22"/><circle cx="37" cy="66" r="19"/><circle cx="83" cy="66" r="19"/><rect x="20" y="60" width="80" height="48" rx="24"/></g>`;
+  return `<path d="${SHAPES[k].d}" fill="${fill}"/>`;
+}
+function starPath(cx, cy, R, r) { let d = ''; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rad = i % 2 ? r : R; d += (i ? 'L' : 'M') + (cx + rad * Math.cos(a)).toFixed(1) + ' ' + (cy + rad * Math.sin(a)).toFixed(1); } return d + 'Z'; }
+const EY = 62, EL = 47, ER = 73;
+const EYES = {
+  dots: () => [EL, ER].map(x => `<circle cx="${x}" cy="${EY}" r="5.5" fill="${INK}"/><circle cx="${x + 1.8}" cy="${EY - 1.8}" r="1.7" fill="#fff"/>`).join(''),
+  googly: () => [EL, ER].map(x => `<circle cx="${x}" cy="${EY}" r="9.5" fill="#fff" stroke="${INK}" stroke-width="2"/><circle cx="${x + 2.5}" cy="${EY + 2}" r="4.5" fill="${INK}"/>`).join(''),
+  happy: () => [EL, ER].map(x => `<path d="M${x - 7} ${EY + 3}Q${x} ${EY - 7} ${x + 7} ${EY + 3}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`).join(''),
+  sleepy: () => [EL, ER].map(x => `<path d="M${x - 7} ${EY - 1}Q${x} ${EY + 6} ${x + 7} ${EY - 1}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`).join(''),
+  cyclops: () => `<circle cx="60" cy="${EY - 2}" r="14" fill="#fff" stroke="${INK}" stroke-width="2.5"/><circle cx="62" cy="${EY}" r="7" fill="${INK}"/><circle cx="64.5" cy="${EY - 3}" r="2.4" fill="#fff"/>`,
+  stars: () => [EL, ER].map(x => `<path d="${starPath(x, EY, 8.5, 3.8)}" fill="#FFD84D" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>`).join(''),
+};
+const MOUTHS = {
+  smile: `<path d="M50 80Q60 90 70 80" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`,
+  grin: `<path d="M47 78Q60 97 73 78Z" fill="${INK}" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><path d="M53 87Q60 93 67 87Q60 83.5 53 87Z" fill="#FF7A9C"/>`,
+  oh: `<ellipse cx="60" cy="84" rx="5" ry="6.5" fill="${INK}"/>`,
+  teeth: `<rect x="48" y="77" width="24" height="12" rx="6" fill="${INK}"/><rect x="51.5" y="78.5" width="17" height="4.5" rx="1.5" fill="#fff"/>`,
+  tongue: `<path d="M50 80Q60 89 70 80" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path d="M56 84.5Q56 93 60.5 93Q65 93 65 84.5Z" fill="#FF7A9C" stroke="${INK}" stroke-width="2"/>`,
+  smirk: `<path d="M50 83Q62 87 70 78" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`,
+};
+const HATS = {
+  none: () => '',
+  crown: y => `<path d="M42 ${y + 6}L44 ${y - 14}L52 ${y - 4}L60 ${y - 18}L68 ${y - 4}L76 ${y - 14}L78 ${y + 6}Z" fill="#FFC42E" stroke="#B87C00" stroke-width="2.5" stroke-linejoin="round"/><circle cx="60" cy="${y - 1}" r="3" fill="#FF4F7A"/><circle cx="49" cy="${y + 1}" r="2.2" fill="#2E8BFF"/><circle cx="71" cy="${y + 1}" r="2.2" fill="#2E8BFF"/>`,
+  party: y => `<path d="M60 ${y - 30}L74 ${y + 6}L46 ${y + 6}Z" fill="#FF5FA8" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><path d="M53.5 ${y - 12}H66.5M50 ${y - 3}H70" stroke="#FFC42E" stroke-width="4"/><circle cx="60" cy="${y - 31}" r="5.5" fill="#FFC42E" stroke="${INK}" stroke-width="2"/>`,
+  cap: y => `<path d="M37 ${y + 10}Q37 ${y - 14} 60 ${y - 14}Q83 ${y - 14} 83 ${y + 10}Z" fill="#2E8BFF" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><path d="M72 ${y + 8}Q94 ${y + 2} 104 ${y + 11}Q88 ${y + 15} 72 ${y + 12}Z" fill="#1A5FD0" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><circle cx="60" cy="${y - 14}" r="3" fill="#FFC42E"/>`,
+  antenna: y => `<path d="M53 ${y + 4}L45 ${y - 16}M67 ${y + 4}L75 ${y - 16}" stroke="${INK}" stroke-width="3" stroke-linecap="round"/><circle cx="45" cy="${y - 17}" r="5.5" fill="#FFC42E" stroke="${INK}" stroke-width="2"/><circle cx="75" cy="${y - 17}" r="5.5" fill="#FF5FA8" stroke="${INK}" stroke-width="2"/>`,
+  bow: y => `<g transform="translate(78 ${y + 6}) rotate(18)"><path d="M0 0L-15 -9L-15 9ZM0 0L15 -9L15 9Z" fill="#FF4F7A" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><circle r="4.5" fill="#FF8FB0" stroke="${INK}" stroke-width="2"/></g>`,
+  wizard: y => `<path d="M60 ${y - 40}Q66 ${y - 14} 78 ${y + 4}L42 ${y + 4}Q54 ${y - 14} 60 ${y - 40}Z" fill="#5B3FD6" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><ellipse cx="60" cy="${y + 5}" rx="27" ry="5.5" fill="#4A31B8" stroke="${INK}" stroke-width="2"/><path d="${starPath(60, y - 12, 6, 2.6)}" fill="#FFC42E"/>`,
+  beanie: y => `<path d="M37 ${y + 12}Q37 ${y - 16} 60 ${y - 16}Q83 ${y - 16} 83 ${y + 12}Z" fill="#FF5A4E" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><rect x="35" y="${y + 5}" width="50" height="10" rx="5" fill="#C93A30" stroke="${INK}" stroke-width="2"/><circle cx="60" cy="${y - 18}" r="6.5" fill="#fff" stroke="${INK}" stroke-width="2"/>`,
+  flower: y => `<path d="M60 ${y + 4}Q58 ${y - 6} 64 ${y - 14}" stroke="#1FA35C" stroke-width="3" fill="none" stroke-linecap="round"/>${[0, 72, 144, 216, 288].map(a => `<circle cx="${(64 + 7 * Math.cos(a * Math.PI / 180)).toFixed(1)}" cy="${(y - 20 + 7 * Math.sin(a * Math.PI / 180)).toFixed(1)}" r="5" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`).join('')}<circle cx="64" cy="${y - 20}" r="4.5" fill="#FFC42E" stroke="${INK}" stroke-width="1.5"/>`,
+};
+const EXTRAS = {
+  none: () => ({ u: '', o: '' }),
+  blush: () => ({ u: `<ellipse cx="35" cy="74" rx="6.5" ry="3.8" fill="#FF7A9C" opacity=".75"/><ellipse cx="85" cy="74" rx="6.5" ry="3.8" fill="#FF7A9C" opacity=".75"/>`, o: '' }),
+  freckles: () => ({ u: [[33, 72], [38, 75], [34, 78], [82, 72], [87, 75], [83, 78]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.5" fill="${INK}" opacity=".55"/>`).join(''), o: '' }),
+  glasses: cy => ({ u: '', o: cy ? `<circle cx="60" cy="60" r="18" fill="rgba(255,255,255,.18)" stroke="${INK}" stroke-width="3"/><path d="M42 58L30 54M78 58L90 54" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`
+    : `<circle cx="47" cy="62" r="11.5" fill="rgba(255,255,255,.18)" stroke="${INK}" stroke-width="3"/><circle cx="73" cy="62" r="11.5" fill="rgba(255,255,255,.18)" stroke="${INK}" stroke-width="3"/><path d="M58.5 61Q60 58.5 61.5 61" stroke="${INK}" stroke-width="3" fill="none"/>` }),
+  shades: cy => ({ u: '', o: cy ? `<rect x="36" y="50" width="48" height="18" rx="8" fill="${INK}"/><path d="M42 55H52" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>`
+    : `<path d="M33 56H59V61Q59 71 47 71Q33 71 33 61ZM61 56H87V61Q87 71 73 71Q61 71 61 61Z" fill="${INK}"/><path d="M59 58H61" stroke="${INK}" stroke-width="3"/><path d="M37 60H44M65 60H72" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/>` }),
+};
+function sanitizeAv(av) {
+  const o = {};
+  for (const k in AV_KEYS) { const n = AV[AV_KEYS[k]].length, v = av && Number.isInteger(av[k]) ? av[k] : 0; o[k] = v >= 0 && v < n ? v : 0; }
+  return o;
+}
+function randomAv() { return { s: ri(5), c: ri(10), e: ri(6), m: ri(6), h: ri(9), x: ri(5) }; }
+function avatarSVG(av) {
+  av = sanitizeAv(av);
+  const sh = AV.shapes[av.s], col = AV.colors[av.c], dark = shade(col, -0.3), S = SHAPES[sh], hy = S.top;
+  const eyeKey = AV.eyes[av.e], ex = EXTRAS[AV.extras[av.x]](eyeKey === 'cyclops');
+  return `<svg class="av" viewBox="0 -22 120 142" aria-hidden="true" focusable="false">`
+    + `<ellipse cx="60" cy="115" rx="34" ry="5" fill="rgba(0,0,0,.28)"/>`
+    + `<g transform="translate(0 5)">${bodyShape(sh, dark)}</g>`
+    + `<ellipse cx="44" cy="108" rx="10" ry="6" fill="${dark}"/><ellipse cx="76" cy="108" rx="10" ry="6" fill="${dark}"/>`
+    + bodyShape(sh, col)
+    + `<ellipse cx="${S.hl[0]}" cy="${S.hl[1]}" rx="8" ry="4.5" fill="#fff" opacity=".4" transform="rotate(-28 ${S.hl[0]} ${S.hl[1]})"/>`
+    + ex.u + EYES[eyeKey]() + MOUTHS[AV.mouths[av.m]] + ex.o + HATS[AV.hats[av.h]](hy)
+    + `</svg>`;
+}
+const avw = (av, cls = '') => `<span class="avw ${cls}">${avatarSVG(av)}</span>`;
+const ADJ = ['Brave', 'Sneaky', 'Mighty', 'Cosmic', 'Turbo', 'Sleepy', 'Fancy', 'Wild', 'Lucky', 'Jolly', 'Swift', 'Epic', 'Funky', 'Zippy'];
+const NOUN = ['Although', 'However', 'Semicolon', 'Comma', 'Whereas', 'Unless', 'Therefore', 'Clause', 'Linker', 'FANBOY', 'Moreover', 'Nor', 'Yet', 'Until'];
+function randomName() { for (let i = 0; i < 30; i++) { const n = pick(ADJ) + ' ' + pick(NOUN); if (n.length <= 16) return n; } return 'Mighty Comma'; }
+const BOT_NAMES = ['Nour', 'Ziad', 'Lina', 'Adam', 'Mira', 'Omar', 'Sara', 'Youssef', 'Hana', 'Karim', 'Laila', 'Tamer'];
+function cleanName(n) {
+  if (typeof n !== 'string') return '';
+  n = n.normalize('NFC').replace(/[\u0000-\u001F\u007F-\u009F​-‏‪-‮⁠-⁯﻿]/g, '').replace(/\s+/g, ' ').trim();
+  return [...n].slice(0, 16).join('').trim();
+}
+const NAME_OK = /^[\p{L}\p{N}][\p{L}\p{N}\p{M} _.'\-]*$/u;
+
+/* ---------------- sound ---------------- */
+const Sound = {
+  ctx: null, master: null, on: true, music: false,
+  ensure() {
+    if (!this.ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; try { this.ctx = new AC(); this.master = this.ctx.createGain(); this.master.gain.value = 0.7; this.master.connect(this.ctx.destination); } catch (e) { return null; } }
+    if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
+    return this.ctx;
+  },
+  tone(f, t, dur = 0.15, type = 'square', vol = 0.1, slide = 0) {
+    const c = this.ctx; if (!c || !this.on) return;
+    const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, f * slide), t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(this.master); o.start(t); o.stop(t + dur + 0.03);
+  },
+  noise(t, dur = 0.08, vol = 0.06, freq = 5000) {
+    const c = this.ctx; if (!c || !this.on) return;
+    if (!this.nbuf) { this.nbuf = c.createBuffer(1, c.sampleRate * 0.5, c.sampleRate); const d = this.nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); s.buffer = this.nbuf; f.type = 'highpass'; f.frequency.value = freq;
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f).connect(g).connect(this.master); s.start(t); s.stop(t + dur + 0.02);
+  },
+  play(name) {
+    const c = this.ensure(); if (!c || !this.on) return; const t = c.currentTime + 0.01;
+    const S = {
+      tap: () => this.tone(660, t, 0.06, 'square', 0.05),
+      join: () => { this.tone(523, t, 0.1, 'square', 0.07); this.tone(784, t + 0.08, 0.14, 'square', 0.07); },
+      tick: () => this.tone(1200, t, 0.05, 'square', 0.05),
+      whoosh: () => { this.noise(t, 0.35, 0.08, 800); this.tone(220, t, 0.35, 'sawtooth', 0.04, 3); },
+      go: () => { this.tone(392, t, 0.12, 'square', 0.08); this.tone(784, t + 0.12, 0.25, 'square', 0.08); },
+      correct: () => { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, t + i * 0.07, 0.16, 'square', 0.07)); },
+      wrong: () => { this.tone(311, t, 0.18, 'sawtooth', 0.07); this.tone(233, t + 0.16, 0.3, 'sawtooth', 0.07); },
+      reveal: () => { this.noise(t, 0.15, 0.08, 2000); [392, 523, 659].forEach((f, i) => this.tone(f, t + 0.05 + i * 0.06, 0.2, 'triangle', 0.1)); },
+      power: () => { this.tone(300, t, 0.3, 'square', 0.06, 4); this.tone(900, t + 0.2, 0.15, 'triangle', 0.08); },
+      glitch: () => { for (let i = 0; i < 6; i++) this.tone(100 + Math.random() * 900, t + i * 0.05, 0.05, 'sawtooth', 0.05); },
+      drum: () => { for (let i = 0; i < 18; i++) this.noise(t + i * 0.07, 0.06, 0.04 + i * 0.004, 300); },
+      fanfare: () => { [[523, 0], [659, 0.12], [784, 0.24], [1047, 0.36], [784, 0.56], [1047, 0.68]].forEach(([f, d]) => { this.tone(f, t + d, 0.22, 'square', 0.08); this.tone(f / 2, t + d, 0.22, 'triangle', 0.08); }); },
+    };
+    (S[name] || (() => {}))();
+  },
+};
+const Music = {
+  timer: null, step: 0, next: 0, bpm: 108,
+  start() { const c = Sound.ensure(); if (!c || this.timer) return; this.step = 0; this.next = c.currentTime + 0.1; this.timer = setInterval(() => this.tick(), 30); },
+  stop() { clearInterval(this.timer); this.timer = null; },
+  tick() {
+    const c = Sound.ctx; if (!c) return;
+    while (this.next < c.currentTime + 0.12) { this.playStep(this.step, this.next); this.next += 60 / this.bpm / 4; this.step = (this.step + 1) % 64; }
+  },
+  playStep(st, t) {
+    if (!Sound.music || !Sound.on) return;
+    const m = n => 440 * Math.pow(2, (n - 69) / 12);
+    const chords = [[48, 52, 55], [45, 48, 52], [41, 45, 48], [43, 47, 50]];
+    const ch = chords[Math.floor(st / 16)], s = st % 16;
+    if (s === 0 || s === 6 || s === 8 || s === 11 || s === 14) Sound.tone(m(ch[0] - 12), t, 0.16, 'triangle', 0.09);
+    if (s % 4 === 2) Sound.noise(t, 0.03, 0.025, 7000);
+    if (s === 4 || s === 12) Sound.noise(t, 0.09, 0.045, 1500);
+    if (s % 2 === 0) Sound.tone(m(ch[(s / 2) % 3] + 24), t, 0.08, 'square', 0.018);
+  },
+};
+
+/* ---------------- confetti + backdrop ---------------- */
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const Confetti = {
+  cv: document.getElementById('confetti'), parts: [], raf: 0,
+  burst(n = 180) {
+    if (reduceMotion) return;
+    const W = innerWidth, cols = ['#FFC42E', '#FF5FA8', '#3DDC97', '#7FB2FF', '#FF8A4C', '#B99BFF', '#fff'];
+    for (let i = 0; i < n; i++) this.parts.push({ x: W / 2 + rnd(-W * 0.35, W * 0.35), y: rnd(-80, -10), vx: rnd(-3, 3), vy: rnd(2, 7), r: rnd(0, 6.28), vr: rnd(-0.2, 0.2), w: rnd(7, 13), h: rnd(4, 8), c: pick(cols), life: 0 });
+    if (!this.raf) this.loop();
+  },
+  loop() {
+    const cv = this.cv, ctx = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1);
+    if (cv.width !== innerWidth * dpr) { cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, innerWidth, innerHeight);
+    this.parts = this.parts.filter(p => p.y < innerHeight + 40 && p.life < 600);
+    for (const p of this.parts) { p.life++; p.vy += 0.06; p.vx *= 0.995; p.x += p.vx + Math.sin(p.life / 12) * 0.6; p.y += p.vy; p.r += p.vr; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.life / 9))); ctx.restore(); }
+    this.raf = this.parts.length ? requestAnimationFrame(() => this.loop()) : 0;
+  },
+};
+(function backdrop() {
+  const cv = document.getElementById('bgfx'), ctx = cv.getContext('2d');
+  const cols = ['#FFC42E', '#FF5FA8', '#3DDC97', '#7FB2FF', '#FF8A4C', '#B99BFF'];
+  const kinds = ['ring', 'dot', 'tri', 'amp', 'squig', 'semi'];
+  let items = [];
+  function size() { const dpr = Math.min(2, devicePixelRatio || 1); cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); items = Array.from({ length: Math.round(clamp(innerWidth / 70, 8, 22)) }, () => ({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, s: rnd(10, 26), k: pick(kinds), c: pick(cols), a: rnd(0.12, 0.28), vx: rnd(-0.15, 0.15), vy: rnd(-0.25, -0.05), r: rnd(0, 6.28), vr: rnd(-0.004, 0.004) })); draw(); }
+  function draw() {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    for (const it of items) {
+      ctx.save(); ctx.translate(it.x, it.y); ctx.rotate(it.r); ctx.globalAlpha = it.a; ctx.strokeStyle = ctx.fillStyle = it.c; ctx.lineWidth = 4; ctx.lineCap = 'round';
+      const s = it.s;
+      if (it.k === 'ring') { ctx.beginPath(); ctx.arc(0, 0, s, 0, 6.28); ctx.stroke(); }
+      else if (it.k === 'dot') { ctx.beginPath(); ctx.arc(0, 0, s / 2.2, 0, 6.28); ctx.fill(); }
+      else if (it.k === 'tri') { ctx.beginPath(); ctx.moveTo(0, -s); ctx.lineTo(s * 0.9, s * 0.6); ctx.lineTo(-s * 0.9, s * 0.6); ctx.closePath(); ctx.stroke(); }
+      else if (it.k === 'squig') { ctx.beginPath(); ctx.moveTo(-s, 0); ctx.bezierCurveTo(-s / 2, -s / 1.5, 0, s / 1.5, s / 2, 0); ctx.bezierCurveTo(s * 0.7, -s / 3, s, -s / 3, s * 1.1, 0); ctx.stroke(); }
+      else { ctx.font = `${s * 2.2}px 'Lilita One', sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(it.k === 'amp' ? '&' : ';', 0, 0); }
+      ctx.restore();
+    }
+  }
+  function loop() { for (const it of items) { it.x += it.vx; it.y += it.vy; it.r += it.vr; if (it.y < -40) { it.y = innerHeight + 40; it.x = Math.random() * innerWidth; } if (it.x < -40) it.x = innerWidth + 40; if (it.x > innerWidth + 40) it.x = -40; } draw(); requestAnimationFrame(loop); }
+  addEventListener('resize', size); size();
+  if (!reduceMotion) requestAnimationFrame(loop);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+})();
+
+function toast(html, color = '#FFC42E', icon = ICON.bulb) {
+  const box = document.getElementById('toasts'); const el = document.createElement('div');
+  el.className = 'toast'; el.innerHTML = `<span class="ti" style="--tc:${color}">${icon}</span><span>${html}</span>`;
+  box.appendChild(el); while (box.children.length > 4) box.firstChild.remove();
+  setTimeout(() => el.remove(), 3600);
+}
+
+/* =========================================================
+   Single-device game: 1–4 players take turns, plus computer rivals
+   ========================================================= */
+function validName(n) { n = cleanName(n); return n.length >= 2 && NAME_OK.test(n) ? n : ''; }
+let scrT = 0, glitchT = 0;
+function startGlitch() {
+  if (reduceMotion) return;
+  document.body.classList.add('glitching'); Sound.play('glitch'); vibrate([30, 30, 30, 30, 30]);
+  const glyphs = '#%&@$*!?<>/\\=+~';
+  clearInterval(scrT); clearTimeout(glitchT);
+  scrT = setInterval(() => $$('.tile .tx,.hq-text').forEach(el => { if (el.dataset.orig == null) el.dataset.orig = el.innerHTML; const txt = el.textContent; el.textContent = [...txt].map(ch => ch !== ' ' && Math.random() < 0.28 ? glyphs[ri(glyphs.length)] : ch).join(''); }), 160);
+  glitchT = setTimeout(endGlitch, 5000);
+}
+function endGlitch() { clearInterval(scrT); clearTimeout(glitchT); document.body.classList.remove('glitching'); $$('[data-orig]').forEach(el => { el.innerHTML = el.dataset.orig; delete el.dataset.orig; }); }
+
+const Actions = {};
+app.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
+  const fn = Actions[el.dataset.act]; if (fn) { e.preventDefault(); fn(el, e); }
+});
+document.addEventListener('keydown', e => {
+  const t = e.target;
+  if (t && t.closest && t.closest('input,textarea,select')) return;
+  if ($('#sheetWrap')) { if (e.key === 'Escape') Game.closeSheet(); return; }
+  if (Game.phase === 'turn' && !e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1) {
+    const k = e.key.toUpperCase(), i = '1234'.includes(k) ? '1234'.indexOf(k) : 'ABCD'.indexOf(k);
+    if (i >= 0) { const b = $(`.tile[data-i="${i}"]`); if (b && !b.disabled) { e.preventDefault(); b.click(); } return; }
+  }
+  if ((e.key === ' ' || e.key === 'Enter') && !(t && t.closest && t.closest('button'))) {
+    const b = $('[data-primary]'); if (b && !b.disabled) { e.preventDefault(); b.click(); }
+  }
+});
+
+const Game = {
+  settings: { count: 12, time: 20, cats: Object.keys(CATS), powers: true, sound: true, rivals: 3 },
+  roster: [], players: [], questions: [], qi: -1, phase: 'home', order: [], turn: 0, cur: null,
+  powerplay: null, glitchers: new Set(), feed: [], counts: [0, 0, 0, 0], qStats: [], qPlayed: 0, prevRank: new Map(),
+  deadline: 0, turnStart: 0, frozenAt: null, lastSec: -1, iv: 0, t: [], tab: 's', draftP: null, queue: [],
+
+  /* ---------- setup & roster ---------- */
+  init() {
+    const d = store.get('ce-local-v1') || {};
+    const roster = Array.isArray(d.roster) ? d.roster.slice(0, 4).map(r => ({ name: validName(r && r.name), av: sanitizeAv(r && r.av) })).filter(r => r.name) : [];
+    this.roster = roster.length ? roster : [{ name: randomName(), av: randomAv() }];
+    const s = d.settings;
+    if (s && typeof s === 'object') {
+      if ([8, 12, 20, 40].includes(s.count)) this.settings.count = s.count;
+      if ([10, 20, 30].includes(s.time)) this.settings.time = s.time;
+      if ([0, 1, 2, 3].includes(s.rivals)) this.settings.rivals = s.rivals;
+      if (Array.isArray(s.cats)) { const c = s.cats.filter(k => CATS[k]); if (c.length) this.settings.cats = c; }
+      if (typeof s.powers === 'boolean') this.settings.powers = s.powers;
+      if (typeof s.sound === 'boolean') this.settings.sound = s.sound;
+    }
+    this.home();
+  },
+  save() { store.set('ce-local-v1', { roster: this.roster, settings: this.settings }); },
+  clear() { this.t.forEach(clearTimeout); this.t = []; clearInterval(this.iv); this.iv = 0; endGlitch(); this.closeSheet(); },
+  later(fn, ms) { this.t.push(setTimeout(fn, ms)); },
+
+  home() { this.clear(); this.phase = 'home'; Music.stop(); Home.render(); },
+
+  setup() {
+    Host.stop(); Player.stop(); this.clear(); this.phase = 'setup'; const s = this.settings;
+    const radio = (name, v, label, on) => `<label><input type="radio" name="${name}" value="${v}" ${on ? 'checked' : ''}><span>${label}</span></label>`;
+    const counts = k => QUESTIONS.filter(q => q.cat === k).length;
+    app.innerHTML = `
+    <div class="screen setup wide">
+      <button class="link-back" data-act="g-home">${ICON.back.replace('<svg', '<svg width="18" height="18"')} Home</button>
+      <div class="setup-head"><p class="eyebrow">New game</p><h2>Who's playing?</h2><p>Up to 4 players take turns on this device.</p></div>
+      <div class="setup-grid">
+        <section class="panel roster-panel" aria-label="Players">
+          <div class="roster">${this.roster.map((r, i) => `
+            <div class="rrow">
+              <button class="rav-btn" data-act="g-edit" data-i="${i}" aria-label="Edit ${esc(r.name)}">${avw(r.av, 'bob')}</button>
+              <div class="rinfo"><b dir="auto">${esc(r.name)}</b><span>Player ${i + 1}</span></div>
+              <button class="btn ghost sm" data-act="g-edit" data-i="${i}">Edit</button>
+              ${this.roster.length > 1 ? `<button class="icon-btn" data-act="g-remove" data-i="${i}" aria-label="Remove ${esc(r.name)}">${ICON.x}</button>` : ''}
+            </div>`).join('')}
+            ${this.roster.length < 4 ? `<button class="add-player" data-act="g-add">+ Add a player</button>` : ''}
+          </div>
+          <fieldset><legend>Computer rivals</legend><div class="seg">${[0, 1, 2, 3].map(n => radio('rivals', n, n === 0 ? 'None' : n, s.rivals === n)).join('')}</div><p class="hint-line">Rivals answer on their own, use power-ups and fill the leaderboard.</p></fieldset>
+        </section>
+        <section class="panel setup-form" id="setupForm" aria-label="Game settings">
+          <fieldset><legend>Number of questions</legend><div class="seg">${[8, 12, 20, 40].map(n => radio('count', n, n === 40 ? 'All 40' : n, s.count === n)).join('')}</div></fieldset>
+          <fieldset><legend>Time per turn</legend><div class="seg">${[10, 20, 30].map(n => radio('time', n, n + ' sec', s.time === n)).join('')}</div></fieldset>
+          <fieldset><legend>Topics</legend><div class="chipset">${Object.entries(CATS).map(([k, c]) => `<label><input type="checkbox" name="cats" value="${k}" ${s.cats.includes(k) ? 'checked' : ''}><span style="--cc:${c.color}">${esc(c.name)} <em>${counts(k)}</em></span></label>`).join('')}</div></fieldset>
+          <fieldset><legend>Extras</legend><div class="toggles">
+            <label class="switch"><input type="checkbox" id="optPowers" ${s.powers ? 'checked' : ''}><span class="sw"></span><span><b>Power-ups</b><small>Pick one after every question</small></span></label>
+            <label class="switch"><input type="checkbox" id="optSound" ${s.sound ? 'checked' : ''}><span class="sw"></span><span><b>Music and sound</b><small>Plays on this device</small></span></label>
+          </div></fieldset>
+        </section>
+      </div>
+      <p class="form-err" id="setupErr" role="alert"></p>
+      <button class="btn xl start-btn" data-act="g-start" data-primary>${ICON.play} Start game</button>
+    </div>`;
+    $$('#app input').forEach(i => i.addEventListener('change', () => this.readSetup()));
+  },
+  readSetup() {
+    const s = this.settings, val = n => { const el = $(`input[name="${n}"]:checked`); return el ? +el.value : null; };
+    if (!$('#setupForm')) return;
+    const c = val('count'), t = val('time'), r = val('rivals');
+    if (c) s.count = c; if (t) s.time = t; if (r != null) s.rivals = r;
+    s.cats = $$('input[name="cats"]:checked').map(i => i.value);
+    s.powers = $('#optPowers').checked; s.sound = $('#optSound').checked;
+    $('#setupErr').textContent = ''; this.save();
+  },
+
+  editPlayer(i) {
+    this.clear(); this.phase = 'edit';
+    const isNew = i >= this.roster.length;
+    this.draftP = { i, isNew, name: isNew ? '' : this.roster[i].name, av: isNew ? randomAv() : { ...this.roster[i].av } };
+    const tabs = [['s', 'Body'], ['c', 'Color'], ['e', 'Eyes'], ['m', 'Mouth'], ['h', 'Hat'], ['x', 'Extras']];
+    app.innerHTML = `<div class="pwrap">
+      <button class="link-back" data-act="g-edit-cancel">${ICON.back.replace('<svg', '<svg width="18" height="18"')} Back</button>
+      <h1 class="bigtitle" style="text-align:center">${isNew ? 'New player' : 'Edit player'}</h1>
+      <div class="spot"><span class="avw bob" id="avPrev">${avatarSVG(this.draftP.av)}</span></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <label class="eyebrow" for="nameIn">Username</label>
+        <div class="name-row"><input class="text-input" id="nameIn" maxlength="16" autocomplete="off" spellcheck="false" dir="auto" placeholder="e.g. Mighty Comma" value="${esc(this.draftP.name)}"><button type="button" class="dice" data-act="g-randname" aria-label="Random username">${ICON.dice}</button></div>
+        <p class="err" id="nameErr" role="alert"></p>
+        <div class="tabs" role="tablist" aria-label="Customize">${tabs.map(([k, l]) => `<button type="button" role="tab" aria-selected="${this.tab === k}" data-act="g-tab" data-k="${k}">${l}</button>`).join('')}</div>
+        <div class="opts" id="opts" role="tabpanel"></div>
+        <div class="row-btns"><button type="button" class="btn ghost" data-act="g-randav">${ICON.dice} Surprise me</button><button type="button" class="btn pink" data-act="g-edit-save">Save ${ICON.check}</button></div>
+      </div></div>`;
+    this.renderOpts();
+    const ni = $('#nameIn');
+    ni.addEventListener('input', () => { this.draftP.name = ni.value; $('#nameErr').textContent = ''; });
+    ni.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); this.saveEdit(); } });
+    if (isNew) setTimeout(() => ni.focus(), 50);
+  },
+  renderOpts() {
+    const k = this.tab, list = AV[AV_KEYS[k]], box = $('#opts'), av = this.draftP.av; if (!box) return;
+    box.innerHTML = list.map((v, i) => {
+      const on = av[k] === i;
+      if (k === 'c') return `<button type="button" class="opt sw" aria-pressed="${on}" aria-label="Color ${i + 1}" data-act="g-opt" data-i="${i}"><i style="--sc:${v}"></i></button>`;
+      return `<button type="button" class="opt" aria-pressed="${on}" aria-label="${esc(v)}" data-act="g-opt" data-i="${i}">${avw({ ...av, [k]: i })}</button>`;
+    }).join('');
+  },
+  setAv(av) { this.draftP.av = sanitizeAv(av); const p = $('#avPrev'); if (p) p.innerHTML = avatarSVG(this.draftP.av); this.renderOpts(); },
+  saveEdit() {
+    const d = this.draftP, n = cleanName($('#nameIn').value), err = $('#nameErr');
+    if (n.length < 2) { err.textContent = 'Use at least 2 letters.'; return; }
+    if (!NAME_OK.test(n)) { err.textContent = 'Use letters, numbers and spaces only.'; return; }
+    if (this.roster.some((r, j) => j !== d.i && r.name.toLowerCase() === n.toLowerCase())) { err.textContent = 'Another player already has that name.'; return; }
+    const entry = { name: n, av: sanitizeAv(d.av) };
+    if (d.isNew) this.roster.push(entry); else this.roster[d.i] = entry;
+    this.save(); Sound.play('join'); this.setup();
+  },
+
+  /* ---------- game flow ---------- */
+  start() {
+    this.readSetup(); const s = this.settings;
+    if (!s.cats.length) { $('#setupErr').textContent = 'Pick at least one topic.'; return; }
+    Sound.ensure(); Sound.on = s.sound; Sound.music = s.sound;
+    const pool = QUESTIONS.filter(q => s.cats.includes(q.cat));
+    this.questions = shuffle(pool).slice(0, s.count).map(q => { const o = shuffle([0, 1, 2, 3]); return { ...q, o: o.map(i => q.o[i]), a: o.indexOf(q.a) }; });
+    const humans = this.roster.map((r, i) => this.newPlayer('h' + i, r.name, r.av, false));
+    const taken = new Set(humans.map(h => h.name.toLowerCase())), rivals = [];
+    for (let i = 0; i < s.rivals; i++) {
+      const n = shuffle(BOT_NAMES).find(b => !taken.has(b.toLowerCase())) || 'Rival ' + (i + 1); taken.add(n.toLowerCase());
+      const r = this.newPlayer('c' + i, n, randomAv(), true); r.skill = rnd(0.45, 0.72); rivals.push(r);
+    }
+    this.players = humans.concat(rivals); this.qi = -1; this.qStats = []; this.qPlayed = 0; this.prevRank = new Map();
+    Music.bpm = 116; Music.start(); keepAwake(); Sound.play('go');
+    this.nextRound();
+  },
+  newPlayer(id, name, av, bot) { return { id, name, av, bot, skill: 0.6, score: 0, streak: 0, best: 0, correct: 0, inv: [], used: null, hide: [], ans: null, result: null }; },
+  humans() { return this.players.filter(p => !p.bot); },
+  ranked() { return this.players.slice().sort((a, b) => b.score - a.score || a.name.localeCompare(b.name)); },
+  rankOf(p) { return this.ranked().indexOf(p) + 1; },
+
+  nextRound() {
+    this.clear();
+    this.qi++;
+    if (this.qi >= this.questions.length) { this.podium(); return; }
+    this.counts = [0, 0, 0, 0]; this.powerplay = null; this.glitchers = new Set(); this.feed = [];
+    for (const p of this.players) { p.used = null; p.hide = []; p.ans = null; p.result = null; }
+    const hs = this.humans(), k = this.qi % hs.length;
+    this.order = hs.slice(k).concat(hs.slice(0, k)); this.turn = 0;
+    this.rivalPowers();
+    this.phase = 'intro'; this.renderIntro(); Sound.play('whoosh'); Music.bpm = 116;
+    [1, 2].forEach(n => this.later(() => { const cd = $('#cd'); if (cd && this.phase === 'intro') { cd.innerHTML = `<span>${3 - n}</span>`; Sound.play('tick'); } }, n * 1000));
+    Sound.play('tick');
+    this.later(() => { if (this.phase === 'intro') this.beginTurn(); }, 3200);
+  },
+  rivalPowers() {
+    if (!this.settings.powers) return;
+    for (const r of this.players.filter(p => p.bot)) {
+      if (!r.inv.length || Math.random() > 0.4) continue;
+      const id = pick(r.inv); r.inv.splice(r.inv.indexOf(id), 1); r.used = id;
+      if (id === 'powerplay' && !this.powerplay) this.powerplay = r.name;
+      if (id === 'glitch') this.glitchers.add(r.id);
+      if (id === 'gift') { const others = this.players.filter(o => o !== r), o = others.length ? pick(others) : null; r.score += 200; if (o) o.score += 200; this.feed.push({ name: r.name, pw: id, to: o ? o.name : null }); continue; }
+      this.feed.push({ name: r.name, pw: id });
+    }
+  },
+  beginTurn() {
+    this.clear();
+    const p = this.order[this.turn]; this.cur = p;
+    if (this.order.length > 1) this.renderHandoff(p); else this.startTurn();
+  },
+  startTurn() {
+    this.clear(); const p = this.cur; this.phase = 'turn';
+    const T = this.settings.time * 1000; this.turnStart = Date.now(); this.deadline = this.turnStart + T; this.frozenAt = null; this.lastSec = -1;
+    this.renderTurn(); Music.bpm = 132;
+    this.iv = setInterval(() => this.tick(), 100);
+    if ([...this.glitchers].some(g => g !== p.id)) {
+      const g = this.players.find(x => this.glitchers.has(x.id) && x.id !== p.id);
+      this.later(() => { if (this.phase === 'turn') { toast(`<b dir="auto">${esc(g.name)}</b> glitched your screen!`, POWERUPS.glitch.color, PW_ICON.glitch); startGlitch(); } }, 300);
+    }
+  },
+  remaining() { return this.frozenAt != null ? this.frozenAt : Math.max(0, this.deadline - Date.now()); },
+  tick() {
+    if (this.phase !== 'turn') return;
+    const rem = this.remaining(), T = this.settings.time * 1000;
+    const arc = $('#arc'), num = $('#ringNum'), ring = $('#ring');
+    if (arc) {
+      arc.setAttribute('stroke-dashoffset', (276.5 * (1 - rem / T)).toFixed(1));
+      const sec = Math.ceil(rem / 1000); if (num.textContent !== String(sec)) num.textContent = sec;
+      const low = sec <= 5 && this.frozenAt == null; ring.classList.toggle('low', low);
+      if (low && sec !== this.lastSec && sec > 0) { Sound.play('tick'); if (sec === 5) Music.bpm = 150; }
+      this.lastSec = sec;
+    }
+    if (rem <= 0) this.timeUp();
+  },
+  answer(i) {
+    const p = this.cur; if (this.phase !== 'turn' || !p) return;
+    const q = this.questions[this.qi];
+    const a = p.ans || (p.ans = { attempts: 0, wrong: null, final: false });
+    if (a.final || p.hide.includes(i) || a.wrong === i) return;
+    a.attempts++; const right = i === q.a;
+    if (!right && p.used === 'immunity' && a.attempts === 1) { a.wrong = i; Sound.play('wrong'); vibrate([40, 40, 40]); this.renderTurn(); return; }
+    a.final = true; a.choice = i; a.correct = right; a.ms = this.frozenAt != null ? 0 : Date.now() - this.turnStart; this.counts[i]++;
+    Sound.play('tap'); vibrate(30); this.locked(i);
+  },
+  timeUp() {
+    const p = this.cur; this.clear();
+    if (!p.ans || !p.ans.final) p.ans = { final: false, attempts: p.ans ? p.ans.attempts : 0 };
+    Sound.play('wrong'); this.locked(null);
+  },
+  locked(choice) {
+    this.clear(); this.phase = 'locked';
+    const next = this.order[this.turn + 1], q = this.questions[this.qi];
+    this.frame(`<main class="intro">
+      ${choice != null ? `<div class="tile t${choice} locked-tile"><span class="let">${'ABCD'[choice]}</span><span class="tx">${esc(q.o[choice])}</span></div>` : ''}
+      <h2 class="bigtitle">${choice != null ? pick(['Locked in!', 'Answer saved!', 'Bold choice!']) : 'Time’s up!'}</h2>
+      <p class="sub">${next ? `Next up: <b dir="auto">${esc(next.name)}</b>` : 'Let’s see the answer…'}</p>
+    </main>`, '');
+    this.later(() => this.endTurn(), 1100);
+  },
+  endTurn() { this.turn++; if (this.turn < this.order.length) this.beginTurn(); else this.reveal(); },
+  usePower(id) {
+    const p = this.cur;
+    if (this.phase !== 'turn' || !p || p.used || !p.inv.includes(id) || (p.ans && p.ans.attempts)) return;
+    p.inv.splice(p.inv.indexOf(id), 1); p.used = id;
+    const q = this.questions[this.qi], wrongs = [0, 1, 2, 3].filter(i => i !== q.a && !p.hide.includes(i));
+    if (id === 'fifty') p.hide = p.hide.concat(shuffle(wrongs).slice(0, 2));
+    if (id === 'eraser') p.hide = p.hide.concat(shuffle(wrongs).slice(0, 1));
+    if (id === 'freeze') this.frozenAt = this.remaining();
+    if (id === 'powerplay') { if (!this.powerplay) this.powerplay = p.name; toast(`Power Play! Everyone earns +50% on this question.`, POWERUPS.powerplay.color, PW_ICON.powerplay); }
+    if (id === 'glitch') { this.glitchers.add(p.id); toast(`Glitch sent! Players after you get scrambled screens and rivals get confused.`, POWERUPS.glitch.color, PW_ICON.glitch); }
+    if (id === 'gift') {
+      const others = this.players.filter(o => o !== p), o = others.length ? pick(others) : null;
+      p.score += 200; if (o) o.score += 200;
+      toast(o ? `You and <b dir="auto">${esc(o.name)}</b> each got 200 points.` : 'You got 200 points.', POWERUPS.gift.color, PW_ICON.gift);
+    }
+    Sound.play('power'); vibrate(40); this.renderTurn();
+  },
+  simulateRival(r) {
+    const q = this.questions[this.qi], T = this.settings.time * 1000;
+    let acc = r.skill;
+    if (r.used === 'fifty') acc += 0.25; if (r.used === 'eraser') acc += 0.12;
+    if ([...this.glitchers].some(g => g !== r.id)) acc -= 0.22;
+    const choose = () => Math.random() < clamp(acc, 0.1, 0.95) ? q.a : pick([0, 1, 2, 3].filter(i => i !== q.a));
+    let c = choose(), attempts = 1;
+    if (c !== q.a && r.used === 'immunity') { c = choose(); attempts = 2; }
+    r.ans = { final: true, choice: c, correct: c === q.a, ms: r.used === 'freeze' ? 0 : rnd(0.2, 0.85) * T, attempts };
+    this.counts[c]++;
+  },
+  reveal() {
+    this.clear(); this.phase = 'reveal';
+    for (const r of this.players) if (r.bot) this.simulateRival(r);
+    const q = this.questions[this.qi], limit = this.settings.time * 1000;
+    this.prevRank = new Map(this.ranked().map((p, i) => [p.id, i + 1]));
+    let right = 0;
+    for (const p of this.players) {
+      const a = p.ans, pw = p.used, ok = !!(a && a.final && a.correct), lines = []; let gained = 0;
+      if (ok) {
+        const streak = p.streak + 1, speed = pw === 'freeze' ? 500 : Math.round(500 * clamp(1 - a.ms / limit, 0, 1)), sb = Math.min(streak - 1, 5) * 60;
+        lines.push(['Correct answer', '+500'], [pw === 'freeze' ? 'Speed bonus (frozen)' : 'Speed bonus', '+' + speed]); if (sb) lines.push(['Streak ×' + streak, '+' + sb]);
+        let mult = 1;
+        if (pw === 'double') { mult *= 2; lines.push(['Double Points', '×2']); }
+        if (pw === 'jeopardy') { mult *= 2; lines.push(['Double Jeopardy', '×2']); }
+        if (this.powerplay) { mult *= 1.5; lines.push(['Power Play', '×1.5']); }
+        if (a.attempts > 1) lines.push(['Saved by Immunity', '✓']);
+        gained = Math.round((500 + speed + sb) * mult); p.streak = streak; p.best = Math.max(p.best, streak); p.correct++; right++;
+      } else {
+        if (pw === 'jeopardy') { gained = -Math.min(500, p.score); lines.push(['Double Jeopardy', String(gained)]); }
+        if (pw === 'saver' && p.streak > 0) lines.push(['Streak saved', '×' + p.streak]); else if (pw !== 'saver') p.streak = 0;
+      }
+      p.score = Math.max(0, p.score + gained);
+      p.result = { ok, gained, lines, choice: a && a.final ? a.choice : null, none: !(a && a.final), pw };
+    }
+    this.qStats[this.qi] = { text: q.q, pct: this.players.length ? right / this.players.length : 0, right, total: this.players.length };
+    this.qPlayed++; Music.bpm = 104;
+    this.renderReveal(); Sound.play('reveal');
+    const hs = this.humans(); if (hs.length === 1) this.later(() => Sound.play(hs[0].result.ok ? 'correct' : 'wrong'), 350);
+  },
+  afterReveal() {
+    if (this.qi >= this.questions.length - 1) { this.podium(); return; }
+    this.clear(); this.phase = 'board'; this.renderBoard();
+  },
+  afterBoard() {
+    if (!this.settings.powers) { this.nextRound(); return; }
+    const r = this.ranked();
+    r.forEach((p, i) => { p.draft = drawPowerups(r.length > 1 ? i / (r.length - 1) : 0); });
+    for (const p of r) if (p.bot) this.addToPack(p, pick(p.draft));
+    this.queue = this.humans().slice().sort((a, b) => this.rankOf(b) - this.rankOf(a));
+    this.nextDraft();
+  },
+  addToPack(p, id) { if (p.inv.length >= 3) p.inv.shift(); p.inv.push(id); p.lastPick = id; },
+  nextDraft() {
+    this.clear();
+    const p = this.queue.shift(); if (!p) { this.nextRound(); return; }
+    this.phase = 'draft'; this.cur = p; this.renderDraft(p);
+  },
+  pickPower(i) {
+    const p = this.cur; if (this.phase !== 'draft' || !p || !p.draft || !p.draft[i]) return;
+    const id = p.draft[i]; this.addToPack(p, id); p.draft = null;
+    Sound.play('power'); toast(`<b>${esc(POWERUPS[id].name)}</b> added to ${esc(p.name)}’s pack.`, POWERUPS[id].color, PW_ICON[id]);
+    this.nextDraft();
+  },
+  podium() { this.clear(); this.phase = 'podium'; Music.stop(); this.renderPodium(); },
+  endEarly() { if (this.qPlayed) this.podium(); else this.setup(); },
+
+  /* ---------- rendering ---------- */
+  hbar() {
+    const inGame = !['podium'].includes(this.phase);
+    const prog = `<div class="qprog" aria-label="Question ${this.qi + 1} of ${this.questions.length}">${this.questions.map((_, i) => `<i class="${i < this.qi || (i === this.qi && ['reveal', 'board', 'draft'].includes(this.phase)) ? 'done' : i === this.qi ? 'now' : ''}"></i>`).join('')}</div>`;
+    return `<header class="hbar">
+      <div class="hb-brand"><span class="mini-logo">Clause<b>&amp;</b>Effect</span></div>
+      <div class="hb-mid">${inGame ? prog : ''}</div>
+      <div class="hb-tools">
+        <button class="icon-btn" data-act="g-sound" aria-label="${Sound.on ? 'Turn sound off' : 'Turn sound on'}">${Sound.on ? ICON.soundOn : ICON.soundOff}</button>
+        <button class="icon-btn" data-act="g-full" aria-label="Full screen">${ICON.full}</button>
+        ${inGame ? `<button class="icon-btn warn" data-act="g-end" aria-label="End the game now">${ICON.stop}</button>` : ''}
+      </div>
+    </header>`;
+  },
+  frame(main, foot) { app.innerHTML = `<div class="host screen">${this.hbar()}${main}${foot ? `<footer class="hfoot">${foot}</footer>` : ''}</div>`; },
+  feedHTML() {
+    const items = this.feed.map(it => `<span class="fi"><i style="--pc:${POWERUPS[it.pw].color}">${PW_ICON[it.pw]}</i><span dir="auto">${esc(it.name)}</span>&nbsp;used ${esc(POWERUPS[it.pw].name)}${it.to ? ` on <b dir="auto">${esc(it.to)}</b>` : ''}</span>`);
+    return items.length ? `<div class="feed">${items.join('')}</div>` : '';
+  },
+  ppHTML() { return this.powerplay ? `<div class="pp-banner">${PW_ICON.powerplay}<span><b dir="auto">${esc(this.powerplay)}</b> started a Power Play: +50% for everyone this question!</span></div>` : ''; },
+  renderIntro() {
+    const q = this.questions[this.qi];
+    this.frame(`<main class="intro">
+      ${catChip(q.cat)}
+      <h2>Question ${this.qi + 1}</h2>
+      <p class="of">of ${this.questions.length}</p>
+      <div class="countdown" id="cd"><span>3</span></div>
+      ${this.feedHTML()}${this.ppHTML()}
+    </main>`, `<span class="spacer"></span><button class="btn ghost" data-act="g-skip-cd">${ICON.skip} Skip countdown</button>`);
+  },
+  renderHandoff(p) {
+    this.phase = 'handoff';
+    this.frame(`<main class="intro handoff">
+      <p class="eyebrow">Question ${this.qi + 1} of ${this.questions.length} · turn ${this.turn + 1} of ${this.order.length}</p>
+      <div class="spot"><span class="avw bob">${avatarSVG(p.av)}</span></div>
+      <h2 class="bigtitle">Pass to <span dir="auto">${esc(p.name)}</span></h2>
+      <p class="sub">Everyone else: no peeking at the answers!</p>
+      ${p.inv.length && this.settings.powers ? `<p class="sub">${p.inv.length} power-up${p.inv.length > 1 ? 's' : ''} ready to use.</p>` : ''}
+      <button class="btn xl" data-act="g-go" data-primary>${ICON.play} Start my turn</button>
+    </main>`, '');
+  },
+  packHTML(usable) {
+    const p = this.cur; if (!this.settings.powers) return '';
+    const locked = !usable || !!p.used || !!(p.ans && p.ans.attempts);
+    const slots = [0, 1, 2].map(i => { const id = p.inv[i]; if (!id) return `<div class="slot empty">Empty</div>`; const w = POWERUPS[id]; return `<button class="slot" style="--pc:${w.color}" data-act="g-power" data-id="${id}" ${locked ? 'disabled' : ''}>${PW_ICON[id]}<span>${esc(w.name)}</span></button>`; }).join('');
+    return `<section class="pack" aria-label="${esc(p.name)}'s power-ups"><div class="pack-head"><b>Power-ups</b><span>${p.inv.length ? 'Use one per question, before you answer' : 'Win one after each question'}</span></div><div class="slots">${slots}</div></section>`;
+  },
+  renderTurn() {
+    const p = this.cur, q = this.questions[this.qi], a = p.ans, retry = !!(a && !a.final && a.attempts > 0);
+    const hide = new Set(p.hide); if (retry && a.wrong != null) hide.add(a.wrong);
+    const long = q.o.some(o => o.length > 26), frozen = this.frozenAt != null, T = this.settings.time * 1000, rem = this.remaining();
+    const active = p.used ? `<div class="active-pw" style="--pc:${POWERUPS[p.used].color}">${PW_ICON[p.used]}<span>${esc(POWERUPS[p.used].name)} is on${p.used === 'freeze' ? ': your timer is stopped' : ''}</span></div>` : '';
+    this.frame(`<main class="hq turn ${frozen ? 'frozen' : ''}">
+      <div class="turn-head">
+        <div class="who">${avw(p.av)}<div><b dir="auto">${esc(p.name)}</b><span>${this.order.length > 1 ? 'your turn' : `question ${this.qi + 1} of ${this.questions.length}`}</span></div></div>
+        <div class="ring ${frozen ? 'frozen' : ''}" id="ring"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="trk" cx="50" cy="50" r="44"/><circle class="arc" id="arc" cx="50" cy="50" r="44" stroke-dasharray="276.5" stroke-dashoffset="${(276.5 * (1 - rem / T)).toFixed(1)}" transform="rotate(-90 50 50)"/></svg><span id="ringNum">${Math.ceil(rem / 1000)}</span></div>
+        <div class="who-score"><b>${fmtN(p.score)}</b><span>points</span></div>
+      </div>
+      <div class="hq-meta">${catChip(q.cat)}${active}</div>
+      ${retry ? `<div class="banner good">${PW_ICON.immunity}<span>Immunity saved you. Try again!</span></div>` : ''}
+      ${this.ppHTML()}
+      <div class="hq-card"><h2 class="hq-text">${fmtQ(q.q)}</h2></div>
+      <div class="tiles ${long ? 'long' : ''}">${q.o.map((o, i) => `<button class="tile t${i}" data-act="g-answer" data-i="${i}" ${hide.has(i) ? 'disabled' : ''}><span class="let">${'ABCD'[i]}</span><span class="tx">${esc(o)}</span></button>`).join('')}</div>
+      ${retry ? '' : this.packHTML(true)}
+    </main>`, `<span class="hint">Click an answer or press <kbd>1</kbd>–<kbd>4</kbd></span>`);
+  },
+  renderReveal() {
+    const q = this.questions[this.qi], last = this.qi >= this.questions.length - 1;
+    const pickers = i => this.players.filter(p => p.result && p.result.choice === i);
+    const tiles = q.o.map((o, i) => {
+      const who = pickers(i);
+      return `<div class="tile t${i} ${i === q.a ? 'right' : 'dim'}"><span class="let">${'ABCD'[i]}</span><span class="tx">${esc(o)}</span>
+        <span class="tail"><span class="pickers">${who.map(p => `<span class="pk" title="${esc(p.name)}">${avatarSVG(p.av)}</span>`).join('')}</span>${i === q.a ? `<span class="ok">${ICON.check}</span>` : ''}</span></div>`;
+    }).join('');
+    const res = this.players.map(p => { const r = p.result; return `<span class="res ${r.ok ? 'good' : 'bad'}">${avw(p.av)}<span dir="auto">${esc(p.name)}</span>${p.bot ? '<em>CPU</em>' : ''}<b>${r.gained > 0 ? '+' + fmtN(r.gained) : r.gained < 0 ? fmtN(r.gained) : r.none ? 'no answer' : '0'}</b></span>`; }).join('');
+    this.frame(`<main class="hq">
+      <div class="hq-meta">${catChip(q.cat)}<span class="hq-num">Question ${this.qi + 1} of ${this.questions.length}</span></div>
+      <div class="hq-card"><h2 class="hq-text">${fmtQ(q.q)}</h2></div>
+      <div class="tiles ${q.o.some(o => o.length > 26) ? 'long' : ''}">${tiles}</div>
+      <div class="why"><span class="wi">${ICON.bulb}</span><span><b>Why?</b> ${esc(q.why)}</span></div>
+      <div class="res-list">${res}</div>
+    </main>`, `<span class="hint"><kbd>Space</kbd> continue</span><span class="spacer"></span>
+      <button class="btn xl" data-act="g-after-reveal" data-primary>${last ? 'Final results' : 'Leaderboard'} ${ICON.next}</button>`);
+  },
+  renderBoard() {
+    const r = this.ranked(), top = r.slice(0, 8);
+    const rows = top.map((p, i) => {
+      const prev = this.prevRank.get(p.id), mv = prev ? prev - (i + 1) : 0, g = p.result ? p.result.gained : 0;
+      return `<li class="row ${i < 3 ? 'r' + (i + 1) : ''}" style="animation-delay:${i * 0.07}s">
+        <span class="rk">${i + 1}</span><span class="rav">${avatarSVG(p.av)}</span>
+        <span class="rn"><span dir="auto">${esc(p.name)}</span>${p.bot ? '<em class="cpu">CPU</em>' : ''}${p.streak >= 2 ? `<span class="flame">${ICON.flame}${p.streak}</span>` : ''}${mv > 0 ? `<span class="mv">▲${mv}</span>` : mv < 0 ? `<span class="mv down">▼${-mv}</span>` : ''}</span>
+        <span class="gain ${g < 0 ? 'neg' : ''}">${g > 0 ? '+' + fmtN(g) : g < 0 ? fmtN(g) : ''}</span>
+        <span class="sc" data-to="${p.score}" data-from="${Math.max(0, p.score - g)}">${fmtN(Math.max(0, p.score - g))}</span></li>`;
+    }).join('');
+    const next = this.settings.powers ? 'Pick power-ups' : 'Next question';
+    const side = this.settings.powers
+      ? `<aside class="side-card"><h3>Up next: power-ups</h3><p>Each player picks one of three power-up cards. Players lower on the leaderboard get better cards.</p><div class="pw-mini">${Object.keys(POWERUPS).map(id => `<span style="--pc:${POWERUPS[id].color}" title="${esc(POWERUPS[id].name)}">${PW_ICON[id]}</span>`).join('')}</div></aside>`
+      : `<aside class="side-card"><h3>Up next</h3><p>Question ${this.qi + 2} of ${this.questions.length}</p></aside>`;
+    this.frame(`<main class="boardwrap"><section><h2 class="board-title">Leaderboard</h2><ol class="board">${rows}</ol>${r.length > 8 ? `<p class="score-line">+ ${r.length - 8} more</p>` : ''}</section>${side}</main>`,
+      `<span class="hint"><kbd>Space</kbd> continue</span><span class="spacer"></span><button class="btn xl" data-act="g-after-board" data-primary>${next} ${ICON.next}</button>`);
+    const els = $$('.sc[data-to]'), t0 = performance.now(), D = 1100;
+    const step = now => { const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3); els.forEach(el => { el.textContent = fmtN(+el.dataset.from + (+el.dataset.to - +el.dataset.from) * e); }); if (k < 1 && this.phase === 'board') requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  },
+  renderDraft(p) {
+    const multi = this.humans().length > 1, full = p.inv.length >= 3;
+    this.frame(`<main class="draft">
+      <div class="who big">${avw(p.av, 'bob')}<div><b dir="auto">${esc(p.name)}</b><span>${ordinal(this.rankOf(p))} place · ${fmtN(p.score)} points</span></div></div>
+      <h2 class="bigtitle">${multi ? `<span dir="auto">${esc(p.name)}</span>, pick a power-up` : 'Pick a power-up'}</h2>
+      <p class="sub">${full ? 'Your pack is full, so your oldest power-up will be swapped out.' : 'It goes into your pack. Use it on a later question, before you answer.'}</p>
+      <div class="cards three">${p.draft.map((id, i) => pwCard(id, `data-act="g-pick" data-i="${i}"`)).join('')}</div>
+      ${p.inv.length ? `<p class="sub small">In your pack: ${p.inv.map(id => esc(POWERUPS[id].name)).join(', ')}</p>` : ''}
+    </main>`, `<span class="hint">Click a card or press <kbd>1</kbd>–<kbd>3</kbd></span><span class="spacer"></span><button class="btn ghost" data-act="g-skip-pick">Skip</button>`);
+  },
+  renderPodium() {
+    const r = this.ranked(), top = [r[1], r[0], r[2]];
+    const crown = `<svg class="crown" viewBox="0 0 64 40" aria-hidden="true"><path d="M4 36L8 6L22 22L32 2L42 22L56 6L60 36Z" fill="#FFC42E" stroke="#8F5F00" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="26" r="4" fill="#FF4F7A"/></svg>`;
+    const pod = (p, place) => p ? `<div class="pod p${place}" id="pod${place}">${place === 1 ? crown : ''}<div class="pav">${avatarSVG(p.av)}</div><div class="pname" dir="auto">${esc(p.name)}${p.bot ? ' <em class="cpu">CPU</em>' : ''}</div><div class="pscore">${fmtN(p.score)}</div><div class="block">${place}</div></div>` : `<div class="pod p${place}" id="pod${place}"></div>`;
+    const humans = this.humans(), winner = r[0];
+    const headline = !winner ? 'Final results' : winner.bot ? `${esc(winner.name)} wins this time!` : `<span dir="auto">${esc(winner.name)}</span> wins!`;
+    const stats = humans.map(p => `<div class="stat pstat">${avw(p.av)}<div><b dir="auto">${esc(p.name)}</b><span>${ordinal(this.rankOf(p))} place · ${p.correct} of ${this.qPlayed} correct · best streak ${p.best}</span></div></div>`).join('');
+    const qs = this.qStats.filter(Boolean), hardest = qs.slice().sort((a, b) => a.pct - b.pct)[0];
+    this.frame(`<main class="podium-wrap">
+      <h2 class="podium-title">${headline}</h2>
+      <div class="podium">${pod(top[0], 2)}${pod(top[1], 1)}${pod(top[2], 3)}</div>
+      ${r.length > 3 ? `<div class="rest">${r.slice(3).map((p, i) => `<span>${i + 4}. <b dir="auto">${esc(p.name)}</b> ${fmtN(p.score)}</span>`).join('')}</div>` : ''}
+      <div class="stats">${stats}${hardest ? `<div class="stat"><b>${Math.round(hardest.pct * 100)}%</b><span>got the toughest one right: “${esc(hardest.text.replace(/___/g, '…'))}”</span></div>` : ''}</div>
+    </main>`, `<button class="btn ghost" data-act="g-setup">Change players</button><span class="spacer"></span><button class="btn xl" data-act="g-again" data-primary>${ICON.play} Play again</button>`);
+    Sound.play('drum');
+    const show = (id, d) => this.later(() => { const el = $('#pod' + id); if (el) el.classList.add('show'); }, d);
+    show(3, 700); show(2, 1500); show(1, 2500);
+    this.later(() => { Sound.play('fanfare'); Confetti.burst(220); }, 2600);
+    this.later(() => Confetti.burst(140), 4200);
+  },
+
+  /* ---------- power-up confirm sheet ---------- */
+  openSheet(id) {
+    const w = POWERUPS[id]; this.closeSheet();
+    const wrap = document.createElement('div'); wrap.id = 'sheetWrap';
+    wrap.innerHTML = `<div class="sheet-back" data-close="1"></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetT">
+      ${pwCard(id, '', 'div').replace('<b>', '<b id="sheetT">')}
+      <div class="row-btns"><button class="btn ghost" data-close="1">Keep it</button><button class="btn" id="useBtn">Use it now</button></div></div>`;
+    document.body.appendChild(wrap);
+    wrap.addEventListener('click', e => { if (e.target.closest('[data-close]')) this.closeSheet(); });
+    $('#useBtn').addEventListener('click', () => { this.closeSheet(); this.usePower(id); });
+    $('#useBtn').focus();
+  },
+  closeSheet() { const w = $('#sheetWrap'); if (w) w.remove(); },
+};
+
+Actions['g-home'] = () => Game.home();
+Actions['g-setup'] = () => { Sound.ensure(); Game.setup(); };
+Actions['g-add'] = () => Game.editPlayer(Game.roster.length);
+Actions['g-edit'] = el => Game.editPlayer(+el.dataset.i);
+Actions['g-remove'] = el => { if (Game.roster.length > 1) { Game.roster.splice(+el.dataset.i, 1); Game.save(); Game.setup(); } };
+Actions['g-edit-cancel'] = () => Game.setup();
+Actions['g-edit-save'] = () => Game.saveEdit();
+Actions['g-randname'] = () => { const i = $('#nameIn'); if (i) { i.value = randomName(); Game.draftP.name = i.value; $('#nameErr').textContent = ''; } Sound.play('tap'); };
+Actions['g-tab'] = el => { Game.tab = el.dataset.k; $$('.tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b === el)); Game.renderOpts(); };
+Actions['g-opt'] = el => { Game.setAv({ ...Game.draftP.av, [Game.tab]: +el.dataset.i }); Sound.play('tap'); };
+Actions['g-randav'] = () => { Game.setAv(randomAv()); Sound.play('join'); };
+Actions['g-start'] = () => Game.start();
+Actions['g-again'] = () => Game.start();
+Actions['g-skip-cd'] = () => { if (Game.phase === 'intro') Game.beginTurn(); };
+Actions['g-go'] = () => { if (Game.phase === 'handoff') Game.startTurn(); };
+Actions['g-answer'] = el => Game.answer(+el.dataset.i);
+Actions['g-power'] = el => { if (Game.phase === 'turn') Game.openSheet(el.dataset.id); };
+Actions['g-after-reveal'] = () => { if (Game.phase === 'reveal') Game.afterReveal(); };
+Actions['g-after-board'] = () => { if (Game.phase === 'board') Game.afterBoard(); };
+Actions['g-pick'] = el => Game.pickPower(+el.dataset.i);
+Actions['g-skip-pick'] = () => { if (Game.phase === 'draft') { Game.cur.draft = null; Game.nextDraft(); } };
+Actions['g-sound'] = el => { Sound.ensure(); Sound.on = !Sound.on; Sound.music = Sound.on; Game.settings.sound = Sound.on; Game.save(); if (Sound.on && Game.phase !== 'podium') Music.start(); el.innerHTML = Sound.on ? ICON.soundOn : ICON.soundOff; el.setAttribute('aria-label', Sound.on ? 'Turn sound off' : 'Turn sound on'); };
+Actions['g-full'] = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else { const p = document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); if (p && p.catch) p.catch(() => toast('Full screen isn’t available here.', '#7FB2FF')); } } catch (e) {} };
+Actions['g-end'] = el => { if (el.classList.contains('armed')) { Game.endEarly(); return; } el.classList.add('armed'); el.setAttribute('aria-label', 'Click again to end the game'); toast('Click the red button again to end the game.', '#FF5566', ICON.stop); setTimeout(() => { el.classList.remove('armed'); el.setAttribute('aria-label', 'End the game now'); }, 3000); };
+document.addEventListener('keydown', e => {
+  if (Game.phase !== 'draft' || e.ctrlKey || e.metaKey || e.altKey) return;
+  const i = '123'.indexOf(e.key); if (e.key.length === 1 && i >= 0) { e.preventDefault(); Game.pickPower(i); }
+});
+
+/* =========================================================
+   Online play: a tiny MQTT-over-WebSocket client and free public relays.
+   Works the same in Android Chrome, iPhone Safari and desktop browsers.
+   ========================================================= */
+const BROKERS = [
+  { url: 'wss://broker.emqx.io:8084/mqtt' },
+  { url: 'wss://broker.hivemq.com:8884/mqtt' },
+  { url: 'wss://test.mosquitto.org:8081/mqtt' },
+  { url: 'wss://public.cloud.shiftr.io', username: 'public', password: 'public' },
+];
+const TOPIC = code => 'clause-effect/v2/' + code;
+const TE = new TextEncoder(), TD = new TextDecoder();
+const utf8Len = s => TE.encode(s).length;
+function mqStr(s) { const b = TE.encode(s); const o = new Uint8Array(b.length + 2); o[0] = b.length >> 8; o[1] = b.length & 255; o.set(b, 2); return o; }
+function mqCat(parts) { let n = 0; for (const p of parts) n += p.length; const o = new Uint8Array(n); let i = 0; for (const p of parts) { o.set(p, i); i += p.length; } return o; }
+function mqPacket(head, body) { const len = []; let n = body.length; do { let d = n % 128; n = Math.floor(n / 128); if (n > 0) d |= 128; len.push(d); } while (n > 0); return mqCat([Uint8Array.of(head, ...len), body]); }
+
+class MiniMqtt {
+  constructor(url, opts = {}) { this.url = url; this.opts = opts; this.subs = new Set(); this.handlers = []; this.connected = false; this.closed = false; this.auto = false; this.tries = 0; this.pid = 1; this.onstate = null; }
+  onMessage(fn) { this.handlers.push(fn); }
+  connect(timeout = 8000) {
+    return new Promise((res, rej) => {
+      let done = false; const fin = (ok, e) => { if (done) return; done = true; clearTimeout(t); ok ? res(this) : rej(e); };
+      const t = setTimeout(() => { fin(false, { type: 'timeout' }); if (!this.connected) this.close(); }, timeout);
+      this.okCb = () => fin(true); this.failCb = e => fin(false, e);
+      this.open();
+    });
+  }
+  open() {
+    if (this.closed) return;
+    let ws; try { ws = new WebSocket(this.url, ['mqtt']); } catch (e) { this.fail(e); return; }
+    this.ws = ws; ws.binaryType = 'arraybuffer'; this.buf = new Uint8Array(0);
+    ws.onopen = () => {
+      const o = this.opts, flags = 0x02 | (o.username ? 0x80 : 0) | (o.password ? 0x40 : 0);
+      const parts = [mqStr('MQTT'), Uint8Array.of(4, flags, 0, 60), mqStr(o.clientId || ('ce' + uid()))];
+      if (o.username) parts.push(mqStr(o.username)); if (o.password) parts.push(mqStr(o.password));
+      this.raw(mqPacket(0x10, mqCat(parts)));
+    };
+    ws.onmessage = ev => { if (ev.data instanceof ArrayBuffer) this.feed(new Uint8Array(ev.data)); };
+    ws.onerror = () => {};
+    ws.onclose = () => {
+      const was = this.connected; this.connected = false; clearInterval(this.pingT);
+      if (this.ws === ws) this.ws = null;
+      if (was && this.onstate) this.onstate(false);
+      if (!was) this.fail({ type: 'closed' });
+      if (this.auto && !this.closed) { const d = Math.min(8000, 1000 * Math.pow(1.6, this.tries++)); setTimeout(() => this.open(), d); }
+    };
+  }
+  fail(e) { if (this.failCb) { const f = this.failCb; this.failCb = null; this.okCb = null; f(e); } }
+  feed(chunk) {
+    const b = new Uint8Array(this.buf.length + chunk.length); b.set(this.buf); b.set(chunk, this.buf.length); this.buf = b;
+    for (;;) {
+      const buf = this.buf; if (buf.length < 2) return;
+      let mult = 1, len = 0, i = 1, byte;
+      do { if (i >= buf.length) return; byte = buf[i++]; len += (byte & 127) * mult; mult *= 128; } while ((byte & 128) && i < 5);
+      if (buf.length < i + len) return;
+      this.handle(buf[0] >> 4, buf[0] & 15, buf.subarray(i, i + len));
+      this.buf = buf.slice(i + len);
+    }
+  }
+  handle(type, flags, body) {
+    if (type === 2) {
+      if (body[1] === 0) {
+        this.connected = true; this.auto = true; this.tries = 0;
+        for (const t of this.subs) this.sendSub(t);
+        clearInterval(this.pingT); this.pingT = setInterval(() => this.raw(Uint8Array.of(0xC0, 0)), 25000);
+        if (this.okCb) { const f = this.okCb; this.okCb = null; this.failCb = null; f(); }
+        if (this.onstate) this.onstate(true);
+      } else { this.fail({ type: 'refused' }); try { this.ws && this.ws.close(); } catch (e) {} }
+    } else if (type === 3) {
+      const tl = (body[0] << 8) | body[1], topic = TD.decode(body.subarray(2, 2 + tl));
+      let off = 2 + tl; if ((flags >> 1) & 3) off += 2;
+      const text = TD.decode(body.subarray(off));
+      for (const h of this.handlers) { try { h(topic, text); } catch (e) {} }
+    }
+  }
+  raw(bytes) { const ws = this.ws; if (ws && ws.readyState === 1) { try { ws.send(bytes); } catch (e) {} } }
+  sendSub(topic) { const id = this.pid = (this.pid % 65000) + 1; this.raw(mqPacket(0x82, mqCat([Uint8Array.of(id >> 8, id & 255), mqStr(topic), Uint8Array.of(0)]))); }
+  subscribe(topic) { this.subs.add(topic); if (this.connected) this.sendSub(topic); }
+  publish(topic, text) { if (!this.connected) return false; this.raw(mqPacket(0x30, mqCat([mqStr(topic), TE.encode(text)]))); return true; }
+  close() { this.closed = true; this.auto = false; clearInterval(this.pingT); try { this.raw(Uint8Array.of(0xE0, 0)); this.ws && this.ws.close(); } catch (e) {} this.fail({ type: 'closed' }); }
+}
+
+class OnlineNet {
+  constructor(brokers) { this.kind = 'online'; this.brokers = brokers; this.clients = []; this.client = null; this.locked = null; this.q = new Map(); this.flushT = 0; }
+  race(onMsg) {
+    return new Promise((res, rej) => {
+      let fails = 0, won = false;
+      this.brokers.forEach(b => {
+        const c = new MiniMqtt(b.url, { clientId: 'ce' + uid(), username: b.username, password: b.password });
+        c.onMessage((t, p) => onMsg(c, t, p)); this.clients.push(c);
+        c.connect(9000).then(() => { if (!won) { won = true; res(c); } }).catch(() => { if (++fails === this.brokers.length && !won) rej({ type: 'offline' }); });
+      });
+    });
+  }
+  async hostStart(code, onPlayer) {
+    this.leave(); this.code = code; const t = TOPIC(code) + '/p';
+    const c = await this.race((cl, topic, text) => {
+      if (cl !== this.client || topic !== t) return;
+      let d; try { d = JSON.parse(text); } catch (e) { return; }
+      if (d && typeof d === 'object' && d.code === code) onPlayer(d.pid, d.m, null);
+    });
+    this.client = c; this.clients.filter(x => x !== c).forEach(x => x.close()); this.clients = [c];
+    c.subscribe(t);
+    c.onstate = ok => App.netState(ok);
+  }
+  send(obj) { if (this.client) this.client.publish(TOPIC(this.code) + '/h', JSON.stringify(obj)); }
+  pub(s) { this.send({ code: this.code, k: 'pub', s }); }
+  priv(pid, m) { this.q.set(pid, m); if (!this.flushT) this.flushT = setTimeout(() => this.flush(), 60); }
+  flush() {
+    this.flushT = 0; let batch = {}, size = 0;
+    for (const [pid, m] of this.q) { const n = utf8Len(JSON.stringify(m)) + pid.length + 8; if (size + n > 24000 && size) { this.send({ code: this.code, k: 'priv', b: batch }); batch = {}; size = 0; } batch[pid] = m; size += n; }
+    if (size) this.send({ code: this.code, k: 'priv', b: batch });
+    this.q.clear();
+  }
+  fx(f) { this.send({ code: this.code, k: 'fx', f }); }
+  async playerJoin(code, onHost) {
+    this.leave(); this.code = code; const t = TOPIC(code) + '/h';
+    const handler = (cl, topic, text) => {
+      if (topic !== t) return;
+      let d; try { d = JSON.parse(text); } catch (e) { return; }
+      if (!d || typeof d !== 'object' || d.code !== code) return;
+      if (!this.locked && d.k === 'pub') { this.locked = cl; cl.onstate = ok => App.netState(ok); this.clients.filter(x => x !== cl).forEach(x => x.close()); this.clients = [cl]; }
+      if (cl === this.locked) onHost(d);
+    };
+    const first = this.race(handler);
+    this.clients.forEach(c => c.subscribe(t));
+    await first;
+  }
+  toHost(pid, m) {
+    const text = JSON.stringify({ code: this.code, pid, m }), t = TOPIC(this.code) + '/p';
+    if (this.locked) this.locked.publish(t, text); else this.clients.forEach(c => c.publish(t, text));
+  }
+  leave() { clearTimeout(this.flushT); this.flushT = 0; this.q.clear(); this.clients.forEach(c => c.close()); this.clients = []; this.client = null; this.locked = null; }
+}
+
+class LocalNet {
+  constructor() { this.kind = 'local'; this.bc = null; try { if ('BroadcastChannel' in window) this.bc = new BroadcastChannel('clause-effect-v2'); } catch (e) { this.bc = null; } }
+  post(x) { try { this.bc && this.bc.postMessage(x); } catch (e) {} }
+  hostStart(code, onPlayer) { this.code = code; if (this.bc) this.bc.onmessage = e => { const d = e.data; if (d && d.dir === 'p' && d.code === code) onPlayer(d.pid, d.m, null); }; return Promise.resolve(); }
+  pub(s) { this.post({ dir: 'h', code: this.code, k: 'pub', s }); }
+  priv(pid, m) { this.post({ dir: 'h', code: this.code, k: 'priv', to: pid, m }); }
+  fx(f) { this.post({ dir: 'h', code: this.code, k: 'fx', f }); }
+  playerJoin(code, onHost) { this.code = code; if (this.bc) this.bc.onmessage = e => { const d = e.data; if (d && d.dir === 'h' && d.code === code) onHost(d); }; return Promise.resolve(); }
+  toHost(pid, m) { this.post({ dir: 'p', code: this.code, pid, m }); }
+  leave() { if (this.bc) this.bc.onmessage = null; }
+}
+
+const App = {
+  params: new URLSearchParams(location.search),
+  inClaude: !!(window.claude && typeof window.claude.use === 'function'),
+  net: null,
+  getNet() {
+    if (this.net) return this.net;
+    const force = this.params.get('net'), b = this.params.get('broker');
+    const local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+    if (force === 'local') this.net = new LocalNet();
+    else if (b && local) this.net = new OnlineNet(b.split(',').filter(u => /^wss?:\/\//.test(u)).map(url => ({ url })));
+    else this.net = new OnlineNet(BROKERS);
+    return this.net;
+  },
+  netState(ok) {
+    let bar = $('#netbar');
+    if (!ok && !bar && (Host.active || Player.active)) { bar = document.createElement('div'); bar.id = 'netbar'; bar.className = 'netbar'; bar.textContent = 'Connection lost. Reconnecting…'; document.body.appendChild(bar); }
+    if (ok && bar && !Player.lostHost) bar.remove();
+  },
+  joinHow() {
+    const k = Host.net ? Host.net.kind : 'online';
+    if (k === 'local') return `<span><b>Test mode:</b> open this page in another tab of this browser, tap <b>Join a game</b> and type the code.</span>`;
+    if (/^https?:$/.test(location.protocol) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+      const url = location.origin + location.pathname;
+      return `<span>On your phone, open</span><span class="url">${esc(url)}</span><button class="copy" data-act="copy-link">Copy link</button><span>then tap <b>Join a game</b>. Or scan:</span>`;
+    }
+    return `<span>On each phone, open this game (the website, or the game file in Chrome on Android), tap <b>Join a game</b> and type the code.</span>`;
+  },
+  init() {
+    const j = (this.params.get('join') || '').toUpperCase();
+    if (/^[A-Z]{4}$/.test(j) && !this.inClaude) Player.start(j); else Game.init();
+  },
+};
+
+const Home = {
+  render() {
+    Host.stop(); Player.stop();
+    const parade = Game.roster.map(r => r.av).concat(Array.from({ length: 6 }, randomAv)).slice(0, 6);
+    const online = !App.inClaude;
+    app.innerHTML = `
+    <main class="home">
+      <h1 class="logo"><span>Clause</span><span class="amp">&amp;</span><span>Effect</span></h1>
+      <p class="tagline">The <b>conjunctions</b> quiz battle for Grade 10</p>
+      <div class="parade" aria-hidden="true">${parade.map((a, i) => `<span class="pa bob" style="animation-delay:${i * -0.4}s">${avatarSVG(a)}</span>`).join('')}</div>
+      <div class="choices ${online ? 'three' : 'one'}">
+        ${online ? `<button class="choice c-host" data-act="go-host"><span class="ci">${ICON.screen}</span><b>Host a game</b><small>This screen shows the questions</small></button>
+        <button class="choice c-join" data-act="go-join"><span class="ci">${ICON.phone}</span><b>Join a game</b><small>Answer and use power-ups on your phone</small></button>` : ''}
+        <button class="choice c-local" data-act="g-setup" ${online ? '' : 'data-primary'}><span class="ci">${ICON.users}</span><b>Play on this device</b><small>Take turns on one screen, with computer rivals</small></button>
+      </div>
+      <ol class="how">${online ? '<li>Host opens a lobby</li><li>Phones join with the code</li><li>Answer fast and grab power-ups</li>' : '<li>Make your characters</li><li>Take turns answering</li><li>Grab power-ups and win</li>'}</ol>
+      ${online ? '' : '<p class="sub small">Playing with phones works in the website version of this game.</p>'}
+    </main>`;
+  },
+};
+Actions['go-home'] = () => Game.home();
+Actions['go-host'] = () => { try { Sound.ensure(); } catch (e) {} Host.setup(); };
+Actions['go-join'] = () => { try { Sound.ensure(); } catch (e) {} Player.start(''); };
+document.addEventListener('keydown', e => {
+  if (!Host.active || (e.target.closest && e.target.closest('input,textarea,select,button'))) return;
+  if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); Host.primary(); }
+  else if (e.key === 's' || e.key === 'S') Host.skip();
+});
+
+
+/* =========================================================
+   Host
+   ========================================================= */
+const Host = {
+  active: false, net: null, code: null, hs: null, seq: 0, phase: 'off',
+  settings: { count: 12, time: 20, cats: Object.keys(CATS), powers: true, sound: true },
+  players: new Map(), questions: [], qi: -1, answers: new Map(), used: new Map(), counts: [0, 0, 0, 0], powerplay: null,
+  qStart: 0, deadline: 0, raf: 0, qTimer: 0, introT: 0, hbT: 0, pubT: 0, rpT: 0, botT: [], qStats: [], qPlayed: 0, lastSec: -1, prevRank: new Map(), feedItems: [], drawn: new Set(), podT: [],
+
+  stop() {
+    if (!this.active) return;
+    this.active = false; this.phase = 'off'; this.clearTimers(); clearInterval(this.hbT); Music.stop();
+    try { this.net && this.net.pub({ hs: this.hs, seq: ++this.seq, phase: 'closed' }); } catch (e) {}
+    setTimeout(() => { try { this.net && this.net.leave(); } catch (e) {} }, 200);
+  },
+  clearTimers() { cancelAnimationFrame(this.raf); clearTimeout(this.qTimer); clearTimeout(this.introT); clearTimeout(this.pubT); this.pubT = 0; this.clearBots(); this.podT.forEach(clearTimeout); this.podT = []; },
+  clearBots() { this.botT.forEach(clearTimeout); this.botT = []; },
+
+  /* ---- setup ---- */
+  setup() {
+    Player.stop(); Game.clear(); Game.phase = 'off'; this.active = true; this.phase = 'setup';
+    const s = this.settings, counts = k => QUESTIONS.filter(q => q.cat === k).length;
+    const radio = (name, v, label, on) => `<label><input type="radio" name="${name}" value="${v}" ${on ? 'checked' : ''}><span>${label}</span></label>`;
+    app.innerHTML = `
+    <div class="screen setup">
+      <button class="link-back" data-act="go-home">${ICON.back.replace('<svg', '<svg width="18" height="18"')} Home</button>
+      <div class="setup-head"><p class="eyebrow">Host a game</p><h2>Set up your game</h2><p>This screen shows the questions. Players join and answer on their own phones.</p></div>
+      <div class="panel setup-form" id="setupForm">
+        <fieldset><legend>Number of questions</legend><div class="seg">${[8, 12, 20, 40].map(n => radio('count', n, n === 40 ? 'All 40' : n, s.count === n)).join('')}</div></fieldset>
+        <fieldset><legend>Time per question</legend><div class="seg">${[10, 20, 30].map(n => radio('time', n, n + ' sec', s.time === n)).join('')}</div></fieldset>
+        <fieldset><legend>Topics</legend><div class="chipset">${Object.entries(CATS).map(([k, c]) => `<label><input type="checkbox" name="cats" value="${k}" ${s.cats.includes(k) ? 'checked' : ''}><span style="--cc:${c.color}">${esc(c.name)} <em>${counts(k)}</em></span></label>`).join('')}</div></fieldset>
+        <fieldset><legend>Extras</legend><div class="toggles">
+          <label class="switch"><input type="checkbox" id="optPowers" ${s.powers ? 'checked' : ''}><span class="sw"></span><span><b>Power-ups</b><small>Players pick one after every question</small></span></label>
+          <label class="switch"><input type="checkbox" id="optSound" ${s.sound ? 'checked' : ''}><span class="sw"></span><span><b>Music and sound</b><small>Plays on this device</small></span></label>
+        </div></fieldset>
+        <p class="form-err" id="setupErr" role="alert"></p>
+        <button class="btn xl full" type="button" data-act="h-open" id="openBtn">${ICON.play} Open the lobby</button>
+      </div>
+    </div>`;
+  },
+  submitSetup() {
+    const s = this.settings, f = $('#setupForm'); if (!f) return;
+    const cats = $$('input[name="cats"]:checked', f).map(i => i.value);
+    if (!cats.length) { $('#setupErr').textContent = 'Pick at least one topic.'; return; }
+    const val = n => { const el = $(`input[name="${n}"]:checked`, f); return el ? +el.value : null; };
+    s.count = val('count') || 12; s.time = val('time') || 20; s.cats = cats; s.powers = $('#optPowers').checked; s.sound = $('#optSound').checked;
+    const b = $('#openBtn'); if (b) { b.disabled = true; b.textContent = 'Connecting to the game server\u2026'; }
+    this.open().catch(err => {
+      this.active = true; this.phase = 'setup';
+      const e = $('#setupErr'); if (e) e.textContent = err && err.type === 'offline' ? 'Couldn\u2019t reach the game server. Check this device\u2019s internet connection and try again.' : 'Something went wrong opening the lobby. Try again.';
+      if (b) { b.disabled = false; b.innerHTML = `${ICON.play} Open the lobby`; }
+    });
+  },
+
+  async open() {
+    Sound.ensure(); Sound.on = this.settings.sound; Sound.music = this.settings.sound;
+    const net = this.net = App.getNet();
+    this.hs = uid(); this.seq = 0; this.players.clear(); this.drawn.clear(); this.qi = -1;
+    this.code = Array.from({ length: 4 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[ri(24)]).join('');
+    await net.hostStart(this.code, (pid, m, meta) => this.onMsg(pid, m, meta));
+    if (!this.active) { net.leave(); return; }
+    this.phase = 'lobby'; this.renderLobby(); this.publish();
+    clearInterval(this.hbT); this.hbT = setInterval(() => this.heartbeat(), 2500);
+    Music.bpm = 104; Music.start(); keepAwake();
+  },
+  heartbeat() {
+    this.publish();
+    if (this.phase === 'lobby') this.renderPlayers();
+  },
+
+  /* ---- state out ---- */
+  ranked() { return [...this.players.values()].sort((a, b) => b.score - a.score || a.name.localeCompare(b.name)); },
+  rankMap() { const m = new Map(); this.ranked().forEach((p, i) => m.set(p.pid, i + 1)); return m; },
+  isActive(p) { return p.bot || Date.now() - p.seen < 20000; },
+  pubState() {
+    const s = { hs: this.hs, seq: ++this.seq, phase: this.phase, n: this.players.size, qi: this.qi, total: this.questions.length, powers: this.settings.powers };
+    const q = this.questions[this.qi];
+    if (this.phase === 'lobby') s.roster = [...this.players.values()].slice(-8).map(p => ({ name: p.name, av: p.av }));
+    if (q && ['intro', 'question', 'reveal'].includes(this.phase)) s.cat = q.cat;
+    if (q && (this.phase === 'question' || this.phase === 'reveal')) { s.text = q.q; s.opts = q.o; s.limit = this.settings.time * 1000; }
+    if (this.phase === 'question') { s.remain = Math.max(0, this.deadline - Date.now()); s.answered = this.answeredCount(); s.pp = this.powerplay; }
+    if (this.phase === 'reveal') { s.correct = q.a; s.counts = this.counts; s.why = q.why; s.last = this.qi >= this.questions.length - 1; }
+    if (this.phase === 'board' || this.phase === 'podium') s.top = this.ranked().slice(0, 5).map(p => ({ name: p.name, av: p.av, score: p.score }));
+    return s;
+  },
+  publish() { clearTimeout(this.pubT); this.pubT = 0; if (this.net) this.net.pub(this.pubState()); },
+  publishSoon() { if (!this.pubT) this.pubT = setTimeout(() => this.publish(), 250); },
+  personal(p) {
+    const a = this.answers.get(p.pid), rank = this.rankMap().get(p.pid) || 0, inGame = ['intro', 'question'].includes(this.phase);
+    return {
+      t: 'me', qi: this.qi, name: p.name, av: p.av, score: p.score, rank, n: this.players.size, streak: p.streak,
+      inv: p.inv, used: inGame ? (this.used.get(p.pid) || null) : null, hide: inGame ? p.hide : [],
+      answered: !!(a && a.final), choice: a && a.final ? a.choice : null, retry: !!(a && !a.final && a.attempts > 0), wrong: a && !a.final ? a.wrong : null, att: a ? a.attempts : 0,
+      result: ['reveal', 'board', 'podium'].includes(this.phase) ? p.result : null,
+      draft: this.phase === 'board' ? p.draft : null, picked: p.picked, lastPick: p.lastPick || null,
+      stats: this.phase === 'podium' ? { correct: p.correct, total: this.qPlayed, best: p.best } : null,
+    };
+  },
+  sendMe(p) { if (!p.bot && this.net) this.net.priv(p.pid, this.personal(p)); },
+  sendAllMe() { for (const p of this.players.values()) this.sendMe(p); },
+
+  /* ---- messages in ---- */
+  onMsg(pid, m, meta) {
+    if (!this.active || typeof pid !== 'string' || pid.length > 40 || !m || typeof m !== 'object') return;
+    if (m.t === 'probe') { this.publishSoon(); return; }
+    if (m.t === 'hello') return this.onHello(pid, m, meta);
+    const p = this.players.get(pid); if (!p || p.bot || m.tok !== p.tok) return;
+    p.seen = Date.now(); if (meta && meta.bind) meta.bind();
+    if (m.t === 'ping') this.sendMe(p);
+    else if (m.t === 'answer') this.onAnswer(p, m);
+    else if (m.t === 'use') this.onUse(p, m);
+    else if (m.t === 'pick') this.onPick(p, m);
+    else if (m.t === 'wave') this.onWave(p);
+  },
+  uniqueName(name, self) {
+    const taken = new Set([...this.players.values()].filter(p => p !== self).map(p => p.name.toLowerCase()));
+    if (!taken.has(name.toLowerCase())) return name;
+    for (let i = 2; i < 99; i++) { const base = [...name].slice(0, 16 - String(i).length - 1).join('').trim(); const n = base + ' ' + i; if (!taken.has(n.toLowerCase())) return n; }
+    return name;
+  },
+  onHello(pid, m, meta) {
+    if (typeof m.tok !== 'string' || m.tok.length < 8 || m.tok.length > 40) return;
+    if (!['lobby', 'intro', 'question', 'reveal', 'board', 'podium'].includes(this.phase)) return;
+    let p = this.players.get(pid);
+    if (p) {
+      if (p.tok !== m.tok) return;
+      p.seen = Date.now(); if (meta && meta.bind) meta.bind();
+      if (this.phase === 'lobby') { const n = cleanName(m.name); if (n.length >= 2 && NAME_OK.test(n)) p.name = this.uniqueName(n, p); p.av = sanitizeAv(m.av); this.renderPlayers(); }
+      this.sendMe(p); this.publishSoon(); return;
+    }
+    if (meta && meta.bind) meta.bind();
+    if (this.players.size >= 60) { this.net.priv(pid, { t: 'full' }); return; }
+    let name = cleanName(m.name); if (name.length < 2 || !NAME_OK.test(name)) name = randomName();
+    name = this.uniqueName(name);
+    p = { pid, tok: m.tok, name, av: sanitizeAv(m.av), score: 0, streak: 0, best: 0, correct: 0, inv: [], hide: [], result: null, draft: null, picked: false, lastPick: null, seen: Date.now(), bot: false };
+    this.players.set(pid, p);
+    Sound.play('join'); this.sendMe(p); this.publishSoon();
+    if (this.phase === 'lobby') this.renderPlayers(); else toast(`<b dir="auto">${esc(p.name)}</b> joined the game`, '#3DDC97', ICON.users);
+  },
+  onWave(p) {
+    if (this.phase !== 'lobby') return;
+    const el = $(`.pl[data-pid="${CSS.escape(p.pid)}"] .avw`); if (el) { el.classList.remove('jump'); void el.offsetWidth; el.classList.add('jump'); setTimeout(() => el.classList.remove('jump'), 750); }
+    Sound.play('tap');
+  },
+  answeredCount() { let n = 0; for (const a of this.answers.values()) if (a.final) n++; return n; },
+  onAnswer(p, m) {
+    if (this.phase !== 'question' || m.qi !== this.qi) { this.sendMe(p); return; }
+    const c = m.c; if (!Number.isInteger(c) || c < 0 || c > 3) return;
+    let a = this.answers.get(p.pid); if (!a) { a = { attempts: 0, final: false, wrong: null }; this.answers.set(p.pid, a); }
+    if (a.final || m.att !== a.attempts) { this.sendMe(p); return; }
+    if (p.hide.includes(c) || a.wrong === c) return;
+    const q = this.questions[this.qi], right = c === q.a;
+    a.attempts++;
+    if (!right && this.used.get(p.pid) === 'immunity' && a.attempts === 1) { a.wrong = c; this.sendMe(p); return; }
+    a.final = true; a.choice = c; a.correct = right; a.ms = Date.now() - this.qStart; this.counts[c]++;
+    this.sendMe(p); this.updateLive(); this.publishSoon(); this.checkAll();
+  },
+  onUse(p, m) {
+    const pw = m.pw;
+    if (this.phase !== 'question' || m.qi !== this.qi || !this.settings.powers || !POWERUPS[pw] || this.used.has(p.pid)) { this.sendMe(p); return; }
+    const a = this.answers.get(p.pid); if (a && a.final) { this.sendMe(p); return; }
+    const idx = p.inv.indexOf(pw); if (idx < 0) { this.sendMe(p); return; }
+    p.inv.splice(idx, 1); this.used.set(p.pid, pw);
+    const q = this.questions[this.qi], wrongs = [0, 1, 2, 3].filter(i => i !== q.a && !p.hide.includes(i) && !(a && a.wrong === i));
+    if (pw === 'fifty') p.hide = p.hide.concat(shuffle(wrongs).slice(0, 2));
+    if (pw === 'eraser') p.hide = p.hide.concat(shuffle(wrongs).slice(0, 1));
+    if (pw === 'powerplay') { if (!this.powerplay) this.powerplay = p.name; this.net.fx({ type: 'powerplay', name: p.name }); this.showPP(); }
+    if (pw === 'glitch') { this.net.fx({ type: 'glitch', from: p.pid, name: p.name }); const h = $('.host'); if (h) { h.classList.remove('shake'); void h.offsetWidth; h.classList.add('shake'); } Sound.play('glitch'); }
+    if (pw === 'gift') {
+      const others = [...this.players.values()].filter(o => o !== p), o = others.length ? pick(others) : null;
+      p.score += 200; if (o) { o.score += 200; this.sendMe(o); }
+      this.net.fx({ type: 'gift', name: p.name, to: o ? o.name : null, toPid: o ? o.pid : null });
+    }
+    this.feedItems.push({ name: p.name, pw }); this.renderFeed(); Sound.play('power');
+    this.sendMe(p); this.publishSoon();
+  },
+  onPick(p, m) {
+    if (this.phase !== 'board' || m.qi !== this.qi || !p.draft || p.picked) { this.sendMe(p); return; }
+    const i = m.i; if (!Number.isInteger(i) || i < 0 || i >= p.draft.length) return;
+    const id = p.draft[i]; if (p.inv.length >= 3) p.inv.shift(); p.inv.push(id); p.picked = true; p.lastPick = id;
+    this.sendMe(p); this.updateDraft();
+  },
+  checkAll() {
+    const act = [...this.players.values()].filter(p => this.isActive(p));
+    if (act.length && act.every(p => { const a = this.answers.get(p.pid); return a && a.final; })) {
+      const qi = this.qi; setTimeout(() => { if (this.phase === 'question' && this.qi === qi) this.reveal(); }, 900);
+    }
+  },
+
+  /* ---- flow ---- */
+  startGame() {
+    if (!this.players.size) return;
+    const pool = QUESTIONS.filter(q => this.settings.cats.includes(q.cat));
+    this.questions = shuffle(pool).slice(0, this.settings.count).map(q => { const order = shuffle([0, 1, 2, 3]); return { ...q, o: order.map(i => q.o[i]), a: order.indexOf(q.a) }; });
+    for (const p of this.players.values()) Object.assign(p, { score: 0, streak: 0, best: 0, correct: 0, inv: [], hide: [], result: null, draft: null, picked: false, lastPick: null });
+    this.qStats = []; this.qPlayed = 0; this.prevRank = new Map();
+    Sound.play('go'); this.startQuestion(0);
+  },
+  startQuestion(i) {
+    this.clearTimers();
+    this.qi = i; this.phase = 'intro'; this.answers.clear(); this.used.clear(); this.counts = [0, 0, 0, 0]; this.powerplay = null; this.feedItems = [];
+    for (const p of this.players.values()) { p.hide = []; p.result = null; p.draft = null; p.picked = false; }
+    this.publish(); this.sendAllMe(); this.renderIntro(); Sound.play('whoosh'); Music.bpm = 116;
+    this.introT = setTimeout(() => this.beginQuestion(), 3300);
+  },
+  beginQuestion() {
+    if (this.phase !== 'intro') return; clearTimeout(this.introT);
+    const T = this.settings.time * 1000;
+    this.phase = 'question'; this.qStart = Date.now(); this.deadline = this.qStart + T; this.lastSec = -1;
+    this.publish(); this.sendAllMe(); this.renderQuestion(); this.scheduleBots(); Music.bpm = 132;
+    const tick = () => { if (this.phase !== 'question') return; const rem = Math.max(0, this.deadline - Date.now()); this.drawRing(rem); if (rem <= 0) { this.reveal(); return; } this.raf = requestAnimationFrame(tick); };
+    this.raf = requestAnimationFrame(tick);
+    this.qTimer = setTimeout(() => { if (this.phase === 'question') this.reveal(); }, T + 80);
+  },
+  reveal() {
+    if (this.phase !== 'question') return;
+    this.clearTimers();
+    const q = this.questions[this.qi], limit = this.settings.time * 1000;
+    this.prevRank = this.rankMap();
+    let right = 0, total = 0;
+    for (const p of this.players.values()) {
+      const a = this.answers.get(p.pid), pw = this.used.get(p.pid) || null, ok = !!(a && a.final && a.correct);
+      const lines = []; let gained = 0;
+      if (ok) {
+        const streak = p.streak + 1, speed = pw === 'freeze' ? 500 : Math.round(500 * clamp(1 - a.ms / limit, 0, 1)), sb = Math.min(streak - 1, 5) * 60;
+        lines.push(['Correct answer', '+500']); lines.push([pw === 'freeze' ? 'Speed bonus (frozen)' : 'Speed bonus', '+' + speed]); if (sb) lines.push(['Streak ×' + streak, '+' + sb]);
+        let mult = 1;
+        if (pw === 'double') { mult *= 2; lines.push(['Double Points', '×2']); }
+        if (pw === 'jeopardy') { mult *= 2; lines.push(['Double Jeopardy', '×2']); }
+        if (this.powerplay) { mult *= 1.5; lines.push(['Power Play', '×1.5']); }
+        if (a.attempts > 1) lines.push(['Saved by Immunity', '✓']);
+        gained = Math.round((500 + speed + sb) * mult); p.streak = streak; p.best = Math.max(p.best, streak); p.correct++;
+      } else {
+        if (pw === 'jeopardy') { gained = -Math.min(500, p.score); lines.push(['Double Jeopardy', String(gained)]); }
+        if (pw === 'saver' && p.streak > 0) lines.push(['Streak saved', '×' + p.streak]); else if (pw !== 'saver') p.streak = 0;
+      }
+      p.score = Math.max(0, p.score + gained);
+      p.result = { ok, gained, lines, choice: a && a.final ? a.choice : null, none: !(a && a.final), pw };
+      if (this.isActive(p) || (a && a.final)) { total++; if (ok) right++; }
+    }
+    this.qStats[this.qi] = { text: q.q, pct: total ? right / total : 0, right, total };
+    this.qPlayed++;
+    this.phase = 'reveal'; Music.bpm = 104;
+    this.publish(); this.sendAllMe(); this.renderReveal(); Sound.play('reveal');
+  },
+  toBoard() {
+    if (this.phase !== 'reveal') return;
+    if (this.qi >= this.questions.length - 1) { this.podium(); return; }
+    this.phase = 'board';
+    if (this.settings.powers) {
+      const r = this.ranked();
+      r.forEach((p, i) => { p.draft = drawPowerups(r.length > 1 ? i / (r.length - 1) : 0); p.picked = false; });
+      for (const p of r) if (p.bot) this.botT.push(setTimeout(() => this.onPick(p, { qi: this.qi, i: ri(3) }), rnd(900, 2800)));
+    }
+    this.publish(); this.sendAllMe(); this.renderBoard();
+  },
+  podium() {
+    this.clearTimers(); this.phase = 'podium'; Music.stop();
+    this.publish(); this.sendAllMe(); this.renderPodium();
+  },
+  skip() {
+    if (this.phase === 'lobby' || this.phase === 'podium') return;
+    if (this.phase === 'intro') { this.beginQuestion(); return; }
+    if (this.phase === 'question') {
+      for (const [pid, pw] of this.used) { const p = this.players.get(pid); if (p && pw !== 'gift' && p.inv.length < 3) p.inv.push(pw); }
+      this.used.clear(); this.answers.clear();
+      toast('Question skipped. No points given.', '#7FB2FF', ICON.skip);
+      if (this.qi >= this.questions.length - 1) { if (this.qPlayed) this.podium(); else this.backToLobby(); } else this.startQuestion(this.qi + 1);
+      return;
+    }
+    this.primary();
+  },
+  primary() {
+    const ph = this.phase;
+    if (ph === 'lobby') this.startGame();
+    else if (ph === 'intro') this.beginQuestion();
+    else if (ph === 'question') this.reveal();
+    else if (ph === 'reveal') this.toBoard();
+    else if (ph === 'board') this.startQuestion(this.qi + 1);
+  },
+  endGame() { if (this.qPlayed) this.podium(); else this.backToLobby(); },
+  backToLobby() {
+    this.clearTimers(); this.phase = 'lobby'; this.qi = -1; this.questions = [];
+    for (const p of this.players.values()) Object.assign(p, { score: 0, streak: 0, best: 0, correct: 0, inv: [], hide: [], result: null, draft: null, picked: false, lastPick: null });
+    this.publish(); this.sendAllMe(); this.renderLobby(); Music.bpm = 104; Music.start();
+  },
+  kick(pid) { const p = this.players.get(pid); if (!p) return; if (!p.bot) this.net.priv(pid, { t: 'kicked' }); this.players.delete(pid); this.renderPlayers(); this.publishSoon(); },
+  addBots(n = 3) {
+    const used = new Set([...this.players.values()].map(p => p.name));
+    for (let i = 0; i < n && this.players.size < 60; i++) {
+      const base = shuffle(BOT_NAMES).find(b => !used.has(b)) || pick(BOT_NAMES); used.add(base);
+      const pid = 'bot-' + uid();
+      this.players.set(pid, { pid, tok: '', name: this.uniqueName(base), av: randomAv(), score: 0, streak: 0, best: 0, correct: 0, inv: [], hide: [], result: null, draft: null, picked: false, lastPick: null, seen: Date.now(), bot: true });
+    }
+    Sound.play('join'); this.renderPlayers(); this.publishSoon();
+  },
+  scheduleBots() {
+    const T = this.settings.time * 1000;
+    for (const p of this.players.values()) {
+      if (!p.bot) continue;
+      if (this.settings.powers && p.inv.length && Math.random() < 0.45) this.botT.push(setTimeout(() => this.onUse(p, { qi: this.qi, pw: pick(p.inv) }), rnd(0.08, 0.2) * T));
+      this.botT.push(setTimeout(() => this.botAnswer(p), rnd(0.25, 0.85) * T));
+    }
+  },
+  botAnswer(p) {
+    if (this.phase !== 'question') return;
+    const q = this.questions[this.qi], a = this.answers.get(p.pid);
+    const avail = [0, 1, 2, 3].filter(i => !p.hide.includes(i) && !(a && a.wrong === i));
+    const wrong = avail.filter(i => i !== q.a);
+    const c = (Math.random() < 0.62 || !wrong.length) ? q.a : pick(wrong);
+    this.onAnswer(p, { qi: this.qi, c, att: a ? a.attempts : 0 });
+    const a2 = this.answers.get(p.pid); if (a2 && !a2.final) this.botT.push(setTimeout(() => this.botAnswer(p), 1300));
+  },
+
+  /* ---- rendering ---- */
+  render() { const m = { lobby: 'renderLobby', intro: 'renderIntro', question: 'renderQuestion', reveal: 'renderReveal', board: 'renderBoard', podium: 'renderPodium' }[this.phase]; if (m) this[m](); },
+  hbar() {
+    const inGame = ['intro', 'question', 'reveal', 'board'].includes(this.phase);
+    const prog = inGame ? `<div class="qprog" aria-label="Question ${this.qi + 1} of ${this.questions.length}">${this.questions.map((_, i) => `<i class="${i < this.qi || (i === this.qi && ['reveal', 'board'].includes(this.phase)) ? 'done' : i === this.qi ? 'now' : ''}"></i>`).join('')}</div>` : '';
+    return `<header class="hbar">
+      <div class="hb-brand"><span class="mini-logo">Clause<b>&amp;</b>Effect</span>${this.code ? `<span class="code-chip">Code <b>${this.code}</b></span>` : ''}</div>
+      <div class="hb-mid">${prog}</div>
+      <div class="hb-tools">
+        <button class="icon-btn" data-act="h-sound" aria-label="${Sound.on ? 'Turn sound off' : 'Turn sound on'}">${Sound.on ? ICON.soundOn : ICON.soundOff}</button>
+        <button class="icon-btn" data-act="h-full" aria-label="Full screen">${ICON.full}</button>
+        ${inGame ? `<button class="icon-btn warn" data-act="h-end" id="endBtn" aria-label="End the game now">${ICON.stop}</button>` : ''}
+      </div>
+    </header>`;
+  },
+  frame(main, foot) { app.innerHTML = `<div class="host screen">${this.hbar()}${main}<footer class="hfoot">${foot}</footer></div>`; },
+  renderLobby() {
+    this.drawn = new Set();
+    this.frame(`<main class="lobby">
+      <section class="join-card" aria-label="How to join">
+        <p class="eyebrow">Game code</p>
+        <div class="code-tiles" aria-label="Game code ${[...this.code].join(' ')}">${[...this.code].map((ch, i) => `<span style="--r:${i % 2 ? 3 : -3}deg">${ch}</span>`).join('')}</div>
+        <div class="join-how">${App.joinHow()}</div>
+        <div class="qr" id="qrBox" hidden></div>
+      </section>
+      <section class="lobby-players">
+        <div class="lp-head"><h2><span id="pcount">0</span> <span id="pword">players</span></h2><span class="net-chip">${esc({ online: 'Online', local: 'Test mode' }[this.net.kind] || '')}</span></div>
+        <div class="pcloud" id="pcloud"></div>
+      </section>
+    </main>`, `<span class="hint">Press <kbd>Space</kbd> to start</span><span class="spacer"></span>
+      <button class="btn ghost" data-act="h-bots">${ICON.bot} Add 3 practice bots</button>
+      <button class="btn xl" data-act="h-start" id="startBtn" disabled>${ICON.play} Start game</button>`);
+    this.renderPlayers(); this.renderQR();
+  },
+  async renderQR() {
+    if (this.net.kind !== 'online' || !/^https?:$/.test(location.protocol)) return;
+    try {
+      if (!window.qrcode) await loadScript('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js');
+      const qr = window.qrcode(0, 'M'); qr.addData(location.origin + location.pathname + '?join=' + this.code); qr.make();
+      const box = $('#qrBox'); if (box) { box.innerHTML = qr.createSvgTag({ cellSize: 5, margin: 2, scalable: true }); box.hidden = false; }
+    } catch (e) {}
+  },
+  renderPlayers() {
+    const cloud = $('#pcloud'); if (!cloud) return;
+    const list = [...this.players.values()];
+    $('#pcount').textContent = list.length; $('#pword').textContent = list.length === 1 ? 'player' : 'players';
+    const sb = $('#startBtn'); if (sb) sb.disabled = !list.length;
+    const sig = list.map(p => [p.pid, p.name, JSON.stringify(p.av), this.isActive(p)].join(':')).join('|');
+    if (sig === cloud.dataset.sig) return; cloud.dataset.sig = sig;
+    if (!list.length) { cloud.innerHTML = `<div class="empty"><b>Waiting for players…</b><span>Share the code. No students yet? Add practice bots to try it out.</span></div>`; return; }
+    cloud.innerHTML = list.map(p => {
+      const fresh = !this.drawn.has(p.pid); this.drawn.add(p.pid);
+      return `<div class="pl ${this.isActive(p) ? '' : 'away'}" data-pid="${esc(p.pid)}" style="${fresh ? '' : 'animation:none'}">
+        ${p.bot ? '<span class="botbadge">BOT</span>' : ''}${avw(p.av, 'bob')}<span class="nm" dir="auto">${esc(p.name)}</span>
+        <button class="kick" data-act="h-kick" data-pid="${esc(p.pid)}" aria-label="Remove ${esc(p.name)}">${ICON.x}</button></div>`;
+    }).join('');
+  },
+  renderIntro() {
+    const q = this.questions[this.qi];
+    this.frame(`<main class="intro">
+      ${catChip(q.cat)}
+      <h2>Question ${this.qi + 1}</h2>
+      <p class="of">of ${this.questions.length}</p>
+      <div class="countdown" id="cd"><span>3</span></div>
+    </main>`, `<span class="spacer"></span><button class="btn ghost" data-act="h-skip">${ICON.skip} Skip countdown</button>`);
+    let n = 3; const step = () => { n--; const cd = $('#cd'); if (!cd || this.phase !== 'intro') return; if (n > 0) { cd.innerHTML = `<span>${n}</span>`; Sound.play('tick'); this.introT2 = setTimeout(step, 1000); } };
+    Sound.play('tick'); clearTimeout(this.introT2); this.introT2 = setTimeout(step, 1000);
+  },
+  tilesHTML(q, reveal) {
+    const long = q.o.some(o => o.length > 26), total = this.counts.reduce((a, b) => a + b, 0);
+    return `<div class="tiles ${long ? 'long' : ''}">${q.o.map((o, i) => {
+      const cls = reveal ? (i === q.a ? 'right' : 'dim') : '';
+      const cnt = reveal ? `<span class="cnt">${i === q.a ? `<span class="ok">${ICON.check}</span>` : ''}${this.counts[i]}</span>` : '';
+      return `<div class="tile t${i} ${cls}"><span class="let">${'ABCD'[i]}</span><span class="tx">${esc(o)}</span>${cnt}</div>`;
+    }).join('')}</div>`;
+  },
+  renderQuestion() {
+    const q = this.questions[this.qi];
+    this.frame(`<main class="hq">
+      <div class="hq-meta">${catChip(q.cat)}<span class="hq-num">Question ${this.qi + 1} of ${this.questions.length}</span></div>
+      <div class="hq-card"><h2 class="hq-text">${fmtQ(q.q)}</h2></div>
+      <div class="hq-row">
+        <div class="ring" id="ring"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="trk" cx="50" cy="50" r="44"/><circle class="arc" id="arc" cx="50" cy="50" r="44" stroke-dasharray="276.5" stroke-dashoffset="0" transform="rotate(-90 50 50)"/></svg><span id="ringNum">${this.settings.time}</span></div>
+        <div class="feed-col"><div id="ppSlot"></div><div class="feed" id="feed" aria-live="polite"></div></div>
+        <div class="answered"><b id="ansCount">0</b><span id="ansOf">of ${this.players.size} answered</span></div>
+      </div>
+      ${this.tilesHTML(q, false)}
+    </main>`, `<span class="hint"><kbd>Space</kbd> show answer · <kbd>S</kbd> skip</span><span class="spacer"></span>
+      <button class="btn ghost" data-act="h-skip">${ICON.skip} Skip question</button>
+      <button class="btn" data-act="h-reveal">${ICON.check} Show answer</button>`);
+    this.updateLive(); this.renderFeed(); if (this.powerplay) this.showPP();
+  },
+  drawRing(rem) {
+    const T = this.settings.time * 1000, arc = $('#arc'), num = $('#ringNum'), ring = $('#ring');
+    if (!arc) return;
+    arc.setAttribute('stroke-dashoffset', (276.5 * (1 - rem / T)).toFixed(1));
+    const sec = Math.ceil(rem / 1000); if (num.textContent !== String(sec)) num.textContent = sec;
+    const low = sec <= 5; ring.classList.toggle('low', low);
+    if (low && sec !== this.lastSec && sec > 0) { Sound.play('tick'); if (sec === 5) Music.bpm = 150; }
+    this.lastSec = sec;
+  },
+  updateLive() { const b = $('#ansCount'); if (b) { b.textContent = this.answeredCount(); $('#ansOf').textContent = `of ${this.players.size} answered`; } },
+  renderFeed() {
+    const f = $('#feed'); if (!f) return;
+    f.innerHTML = this.feedItems.slice(-6).map(it => `<span class="fi"><i style="--pc:${POWERUPS[it.pw].color}">${PW_ICON[it.pw]}</i><span dir="auto">${esc(it.name)}</span>&nbsp;used ${esc(POWERUPS[it.pw].name)}</span>`).join('');
+  },
+  showPP() { const s = $('#ppSlot'); if (s && !s.innerHTML) s.innerHTML = `<div class="pp-banner">${PW_ICON.powerplay}<span><b dir="auto">${esc(this.powerplay)}</b> started a Power Play: +50% for everyone!</span></div>`; },
+  renderReveal() {
+    const q = this.questions[this.qi], st = this.qStats[this.qi], last = this.qi >= this.questions.length - 1;
+    this.frame(`<main class="hq">
+      <div class="hq-meta">${catChip(q.cat)}<span class="hq-num">Question ${this.qi + 1} of ${this.questions.length}</span></div>
+      <div class="hq-card"><h2 class="hq-text">${fmtQ(q.q)}</h2></div>
+      ${this.tilesHTML(q, true)}
+      <div class="why"><span class="wi">${ICON.bulb}</span><span><b>Why?</b> ${esc(q.why)}</span></div>
+      <p class="score-line"><b>${st.right}</b> of ${st.total} got it right</p>
+    </main>`, `<span class="hint"><kbd>Space</kbd> continue</span><span class="spacer"></span>
+      <button class="btn xl" data-act="h-next">${last ? 'Final results' : 'Leaderboard'} ${ICON.next}</button>`);
+  },
+  renderBoard() {
+    const r = this.ranked(), top = r.slice(0, 8);
+    const rows = top.map((p, i) => {
+      const prev = this.prevRank.get(p.pid), mv = prev ? prev - (i + 1) : 0, g = p.result ? p.result.gained : 0;
+      return `<li class="row ${i < 3 ? 'r' + (i + 1) : ''}" style="animation-delay:${i * 0.07}s">
+        <span class="rk">${i + 1}</span><span class="rav">${avatarSVG(p.av)}</span>
+        <span class="rn"><span dir="auto">${esc(p.name)}</span>${p.streak >= 2 ? `<span class="flame">${ICON.flame}${p.streak}</span>` : ''}${mv > 0 ? `<span class="mv">▲${mv}</span>` : mv < 0 ? `<span class="mv down">▼${-mv}</span>` : ''}</span>
+        <span class="gain ${g < 0 ? 'neg' : ''}">${g > 0 ? '+' + fmtN(g) : g < 0 ? fmtN(g) : ''}</span>
+        <span class="sc" data-to="${p.score}" data-from="${Math.max(0, p.score - g)}">${fmtN(Math.max(0, p.score - g))}</span></li>`;
+    }).join('');
+    const side = this.settings.powers ? `<aside class="side-card"><h3>Power-up draft</h3><p>Everyone is picking one power-up on their phone right now.</p><div class="meter"><i id="draftBar" style="width:0%"></i></div><p id="draftTxt">0 picked</p><div class="pw-mini" id="draftMini"></div></aside>`
+      : `<aside class="side-card"><h3>Next up</h3><p>Question ${this.qi + 2} of ${this.questions.length}</p></aside>`;
+    this.frame(`<main class="boardwrap"><section><h2 class="board-title">Leaderboard</h2><ol class="board">${rows}</ol>${r.length > 8 ? `<p class="score-line">+ ${r.length - 8} more players</p>` : ''}</section>${side}</main>`,
+      `<span class="hint"><kbd>Space</kbd> next question</span><span class="spacer"></span><button class="btn xl" data-act="h-next">Next question ${ICON.next}</button>`);
+    this.countUp(); this.updateDraft();
+  },
+  countUp() {
+    const els = $$('.sc[data-to]'); if (!els.length) return; const t0 = performance.now(), D = 1100;
+    const step = now => { const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3); els.forEach(el => { const a = +el.dataset.from, b = +el.dataset.to; el.textContent = fmtN(a + (b - a) * e); }); if (k < 1 && this.phase === 'board') requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  },
+  updateDraft() {
+    const bar = $('#draftBar'); if (!bar) return;
+    const all = [...this.players.values()].filter(p => p.draft), done = all.filter(p => p.picked);
+    bar.style.width = (all.length ? done.length / all.length * 100 : 0) + '%';
+    $('#draftTxt').textContent = `${done.length} of ${all.length} picked`;
+    $('#draftMini').innerHTML = done.slice(-12).map(p => `<span style="--pc:${POWERUPS[p.lastPick].color}" title="${esc(POWERUPS[p.lastPick].name)}">${PW_ICON[p.lastPick]}</span>`).join('');
+  },
+  renderPodium() {
+    const r = this.ranked(), top = [r[1], r[0], r[2]];
+    const crown = `<svg class="crown" viewBox="0 0 64 40" aria-hidden="true"><path d="M4 36L8 6L22 22L32 2L42 22L56 6L60 36Z" fill="#FFC42E" stroke="#8F5F00" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="26" r="4" fill="#FF4F7A"/></svg>`;
+    const pod = (p, place) => p ? `<div class="pod p${place}" id="pod${place}">${place === 1 ? crown : ''}<div class="pav">${avatarSVG(p.av)}</div><div class="pname" dir="auto">${esc(p.name)}</div><div class="pscore">${fmtN(p.score)}</div><div class="block">${place}</div></div>` : `<div class="pod p${place}" id="pod${place}"></div>`;
+    const stats = this.qStats.filter(Boolean), acc = stats.length ? stats.reduce((a, s) => a + s.pct, 0) / stats.length : 0;
+    const hardest = stats.slice().sort((a, b) => a.pct - b.pct)[0];
+    this.frame(`<main class="podium-wrap">
+      <h2 class="podium-title">Final results</h2>
+      <div class="podium">${pod(top[0], 2)}${pod(top[1], 1)}${pod(top[2], 3)}</div>
+      ${r.length > 3 ? `<div class="rest">${r.slice(3, 20).map((p, i) => `<span>${i + 4}. <b dir="auto">${esc(p.name)}</b> ${fmtN(p.score)}</span>`).join('')}</div>` : ''}
+      <div class="stats"><div class="stat"><b>${Math.round(acc * 100)}%</b><span>class accuracy</span></div><div class="stat"><b>${this.qPlayed}</b><span>questions played</span></div>${hardest ? `<div class="stat"><b>${Math.round(hardest.pct * 100)}%</b><span>on the toughest: “${esc(hardest.text.replace(/___/g, '…'))}”</span></div>` : ''}</div>
+    </main>`, `<button class="btn ghost" data-act="h-new">New game</button><span class="spacer"></span><button class="btn xl" data-act="h-again">${ICON.play} Play again</button>`);
+    Sound.play('drum');
+    const show = (id, d) => this.podT.push(setTimeout(() => { const el = $('#pod' + id); if (el) el.classList.add('show'); }, d));
+    show(3, 700); show(2, 1500); show(1, 2500);
+    this.podT.push(setTimeout(() => { Sound.play('fanfare'); Confetti.burst(220); }, 2600));
+    this.podT.push(setTimeout(() => Confetti.burst(140), 4200));
+  },
+};
+Actions['h-open'] = () => Host.submitSetup();
+Actions['h-start'] = () => Host.startGame();
+Actions['h-bots'] = () => Host.addBots(3);
+Actions['h-kick'] = el => Host.kick(el.dataset.pid);
+Actions['h-skip'] = () => Host.skip();
+Actions['h-reveal'] = () => Host.reveal();
+Actions['h-next'] = () => Host.primary();
+Actions['h-again'] = () => Host.backToLobby();
+Actions['h-new'] = () => { Host.stop(); Host.setup(); };
+Actions['h-sound'] = el => { Sound.ensure(); Sound.on = !Sound.on; Sound.music = Sound.on; Host.settings.sound = Sound.on; if (Sound.on && Host.phase !== 'podium') Music.start(); el.innerHTML = Sound.on ? ICON.soundOn : ICON.soundOff; el.setAttribute('aria-label', Sound.on ? 'Turn sound off' : 'Turn sound on'); };
+Actions['h-full'] = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else { const p = document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); if (p && p.catch) p.catch(() => toast('Full screen isn’t available here.', '#7FB2FF')); } } catch (e) {} };
+Actions['h-end'] = el => { if (el.classList.contains('armed')) { Host.endGame(); return; } el.classList.add('armed'); el.setAttribute('aria-label', 'Tap again to end the game'); toast('Tap the red button again to end the game.', '#FF5566', ICON.stop); setTimeout(() => { el.classList.remove('armed'); el.setAttribute('aria-label', 'End the game now'); }, 3000); };
+Actions['copy-link'] = el => { const url = location.origin + location.pathname; const done = () => { el.textContent = 'Copied'; setTimeout(() => el.textContent = 'Copy link', 1600); }; try { navigator.clipboard.writeText(url).then(done, () => { const u = $('.join-how .url'); if (u) { const r = document.createRange(); r.selectNodeContents(u); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } }); } catch (e) {} };
+
+/* =========================================================
+   Player
+   ========================================================= */
+const Player = {
+  active: false, net: null, code: '', pid: null, tok: null, name: '', av: null, pub: null, me: null, hs: null, seq: 0,
+  view: '', lastHost: 0, deadline: 0, raf: 0, loopT: 0, pending: null, pendingUse: null, pendingPick: null, localAns: null, tab: 's', glitchT: 0, scrT: 0, joined: false, waitPub: null,
+
+  stop() { if (!this.active) return; this.active = false; cancelAnimationFrame(this.raf); clearInterval(this.loopT); clearTimeout(this.waitPub); try { this.net && this.net.leave(); } catch (e) {} this.endGlitch(); },
+  start(prefill) {
+    Host.stop(); Game.clear(); Game.phase = 'off'; this.stop(); this.active = true; this.joined = false; this.pub = null; this.me = null; this.hs = null; this.seq = 0; this.view = '';
+    const saved = store.get('ce-player') || {};
+    this.av = saved.av ? sanitizeAv(saved.av) : randomAv(); this.name = saved.name || '';
+    this.renderCode(prefill || '');
+  },
+  renderCode(prefill, err = '') {
+    app.innerHTML = `<div class="pwrap">
+      <button class="link-back" data-act="go-home">${ICON.back.replace('<svg', '<svg width="18" height="18"')} Home</button>
+      <div class="center" id="codeForm">
+        <div class="spot"><span class="avw bob">${avatarSVG(this.av)}</span></div>
+        <h1 class="bigtitle">Join a game</h1>
+        <p class="sub">Type the 4-letter code on the big screen.</p>
+        <label class="sr" for="codeIn">Game code</label>
+        <input class="code-input" id="codeIn" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABCD" value="${esc(prefill)}">
+        <p class="err" id="codeErr" role="alert">${esc(err)}</p>
+        <button class="btn xl full" type="button" data-act="p-find" id="codeBtn">Find game ${ICON.next}</button>
+        ${App.getNet().kind === 'local' ? `<p class="sub" style="font-size:14px">Test mode: the host must be open in another tab of this browser.</p>` : ''}
+      </div></div>`;
+    const inp = $('#codeIn');
+    inp.addEventListener('input', () => { inp.value = inp.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); });
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (!$('#codeBtn').disabled) this.find(inp.value); } });
+    if (prefill.length === 4) this.find(prefill); else setTimeout(() => inp.focus(), 50);
+  },
+  async find(code) {
+    code = (code || '').toUpperCase(); const err = $('#codeErr'), btn = $('#codeBtn');
+    if (!/^[A-Z]{4}$/.test(code)) { err.textContent = 'The code has 4 letters.'; return; }
+    err.textContent = ''; btn.disabled = true; btn.innerHTML = 'Looking for the game…';
+    const fail = msg => { if (!this.active) return; btn.disabled = false; btn.innerHTML = `Find game ${ICON.next}`; err.textContent = msg; };
+    const net = this.net = App.getNet(); this.code = code; this.pub = null; this.hs = null; this.seq = 0;
+    try { await net.playerJoin(code, env => this.onEnv(env)); }
+    catch (e) { fail('Couldn\u2019t reach the game server. Check your internet connection and try again.'); return; }
+    const saved = tabStore.get('ce-seat') || {};
+    if (saved.code === code && saved.pid && saved.tok) { this.pid = saved.pid; this.tok = saved.tok; } else { this.pid = 'p' + uid(); this.tok = uid() + uid(); }
+    const probe = () => net.toHost(this.pid, { t: 'probe' });
+    probe(); const pt = setInterval(probe, 1500);
+    clearTimeout(this.waitPub);
+    await new Promise(res => { this.gotPub = res; this.waitPub = setTimeout(res, 10000); });
+    clearInterval(pt); clearTimeout(this.waitPub); this.gotPub = null;
+    if (!this.active) return;
+    if (!this.pub) { fail(`No game found with the code ${code}. Check the big screen and try again.`); return; }
+    if (this.pub.phase === 'closed') { fail('That game has ended. Ask the host for the new code.'); return; }
+    this.renderCreate();
+  },
+  renderCreate() {
+    this.view = 'create';
+    const tabs = [['s', 'Body'], ['c', 'Color'], ['e', 'Eyes'], ['m', 'Mouth'], ['h', 'Hat'], ['x', 'Extras']];
+    app.innerHTML = `<div class="pwrap">
+      <div class="ptop"><span class="code-chip">Game <b>${esc(this.code)}</b></span></div>
+      <h1 class="bigtitle" style="text-align:center">Make your character</h1>
+      <div class="spot"><span class="avw bob" id="avPrev">${avatarSVG(this.av)}</span></div>
+      <div id="createForm" style="display:flex;flex-direction:column;gap:14px">
+        <label class="eyebrow" for="nameIn">Your username</label>
+        <div class="name-row"><input class="text-input" id="nameIn" maxlength="16" autocomplete="off" spellcheck="false" dir="auto" placeholder="e.g. Mighty Comma" value="${esc(this.name)}"><button type="button" class="dice" data-act="p-randname" aria-label="Random username">${ICON.dice}</button></div>
+        <p class="err" id="nameErr" role="alert"></p>
+        <div class="tabs" role="tablist" aria-label="Customize">${tabs.map(([k, l]) => `<button type="button" role="tab" aria-selected="${this.tab === k}" data-act="p-tab" data-k="${k}">${l}</button>`).join('')}</div>
+        <div class="opts" id="opts" role="tabpanel"></div>
+        <div class="row-btns"><button type="button" class="btn ghost" data-act="p-randav">${ICON.dice} Surprise me</button><button type="button" class="btn pink" id="joinBtn" data-act="p-join">I'm ready ${ICON.next}</button></div>
+      </div></div>`;
+    this.renderOpts();
+    const ni = $('#nameIn');
+    ni.addEventListener('input', e => { this.name = e.target.value; $('#nameErr').textContent = ''; });
+    ni.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (!$('#joinBtn').disabled) this.join(); } });
+  },
+  renderOpts() {
+    const k = this.tab, list = AV[AV_KEYS[k]], box = $('#opts'); if (!box) return;
+    box.innerHTML = list.map((v, i) => {
+      const on = this.av[k] === i;
+      if (k === 'c') return `<button type="button" class="opt sw" aria-pressed="${on}" aria-label="Color ${i + 1}" data-act="p-opt" data-i="${i}"><i style="--sc:${v}"></i></button>`;
+      const av = { ...this.av, [k]: i };
+      return `<button type="button" class="opt" aria-pressed="${on}" aria-label="${esc(v)}" data-act="p-opt" data-i="${i}">${avw(av)}</button>`;
+    }).join('');
+  },
+  setAv(av) { this.av = sanitizeAv(av); const p = $('#avPrev'); if (p) p.innerHTML = avatarSVG(this.av); this.renderOpts(); },
+  join() {
+    const n = cleanName($('#nameIn').value);
+    if (n.length < 2) { $('#nameErr').textContent = 'Use at least 2 letters.'; return; }
+    if (!NAME_OK.test(n)) { $('#nameErr').textContent = 'Use letters, numbers and spaces only.'; return; }
+    this.name = n; store.set('ce-player', { name: n, av: this.av }); tabStore.set('ce-seat', { code: this.code, pid: this.pid, tok: this.tok });
+    const btn = $('#joinBtn'); btn.disabled = true; btn.textContent = 'Joining…';
+    this.joined = true; this.hello();
+    clearInterval(this.loopT); this.loopT = setInterval(() => this.maintain(), 1500); this.lastHost = Date.now();
+    setTimeout(() => { if (this.active && !this.me && btn.isConnected) { btn.disabled = false; btn.innerHTML = `Try again ${ICON.next}`; $('#nameErr').textContent = 'The host didn’t answer. Try again.'; this.joined = false; } }, 8000);
+    keepAwake();
+  },
+  hello() { this.net.toHost(this.pid, { t: 'hello', tok: this.tok, name: this.name, av: this.av }); },
+  send(m) { this.net.toHost(this.pid, { ...m, tok: this.tok }); },
+  maintain() {
+    if (!this.active || !this.joined) return;
+    this.tick = (this.tick || 0) + 1;
+    if (!this.me) this.hello();
+    else if (this.tick % 3 === 0) this.send({ t: 'ping' });
+    const s = this.pub, me = this.me;
+    if (s && me) {
+      if (this.pending && s.phase === 'question' && s.qi === this.pending.qi && !me.answered && me.att === this.pending.att) this.send({ t: 'answer', qi: this.pending.qi, c: this.pending.c, att: this.pending.att });
+      if (this.pendingUse && s.phase === 'question' && s.qi === this.pendingUse.qi && !me.used) this.send({ t: 'use', qi: s.qi, pw: this.pendingUse.pw });
+      if (this.pendingPick && s.phase === 'board' && s.qi === this.pendingPick.qi && !me.picked) this.send({ t: 'pick', qi: s.qi, i: this.pendingPick.i });
+    }
+    const lost = Date.now() - this.lastHost > 12000; let bar = $('#netbar');
+    if (lost && !bar) { bar = document.createElement('div'); bar.id = 'netbar'; bar.className = 'netbar'; bar.textContent = 'Lost the host. Reconnecting…'; document.body.appendChild(bar); }
+    if (!lost && bar) bar.remove();
+  },
+  onEnv(env) {
+    if (!this.active) return;
+    if (env.k === 'pub') {
+      const s = env.s; if (!s || typeof s !== 'object') return;
+      if (s.hs !== this.hs) { if (this.hs && this.joined && this.me) { this.me = null; this.view = ''; } this.hs = s.hs; this.seq = 0; }
+      if (!(s.seq > this.seq)) return; this.seq = s.seq; this.lastHost = Date.now();
+      const prev = this.pub; this.pub = s;
+      if (this.gotPub) { this.gotPub(); return; }
+      if (s.phase === 'question') { const dl = Date.now() + (s.remain || 0); if (!prev || prev.qi !== s.qi || prev.phase !== 'question' || Math.abs(dl - this.deadline) > 1500) this.deadline = dl; }
+      this.update();
+    } else if (env.k === 'priv') {
+      let m = null; if (env.b && typeof env.b === 'object') m = env.b[this.pid]; else if (env.to === this.pid) m = env.m;
+      if (!m || typeof m !== 'object') return; this.lastHost = Date.now(); this.onPriv(m);
+    } else if (env.k === 'fx' && env.f && this.me) this.onFx(env.f);
+  },
+  onPriv(m) {
+    if (m.t === 'kicked') { this.joined = false; tabStore.set('ce-seat', {}); this.stop(); this.renderEnd('You were removed from the game', 'Ask the host if you think this was a mistake.'); return; }
+    if (m.t === 'full') { this.joined = false; this.renderEnd('This game is full', 'The lobby can take 60 players.'); this.stop(); return; }
+    if (m.t !== 'me' || !this.joined) return;
+    const prev = this.me; this.me = m;
+    if (this.pending && (m.qi !== this.pending.qi || m.answered || m.att > this.pending.att)) {
+      if (m.retry && m.qi === this.pending.qi && !m.answered) { this.localAns = null; vibrate([40, 40, 40]); }
+      this.pending = null;
+    }
+    if (this.pendingUse && (m.used || m.qi !== this.pendingUse.qi)) this.pendingUse = null;
+    if (this.pendingPick && (m.picked || m.qi !== this.pendingPick.qi)) this.pendingPick = null;
+    if (prev && prev.result == null && m.result) { Sound.play(m.result.ok ? 'correct' : 'wrong'); vibrate(m.result.ok ? 60 : [80, 60, 80]); }
+    this.name = m.name; this.av = m.av;
+    this.update();
+  },
+  onFx(f) {
+    if (f.type === 'glitch' && f.from !== this.pid) { toast(`<b dir="auto">${esc(f.name)}</b> glitched your screen!`, POWERUPS.glitch.color, PW_ICON.glitch); this.startGlitch(); }
+    else if (f.type === 'powerplay') { toast(`<b dir="auto">${esc(f.name)}</b> started a Power Play: +50% for everyone!`, POWERUPS.powerplay.color, PW_ICON.powerplay); Sound.play('power'); }
+    else if (f.type === 'gift' && f.toPid === this.pid) { toast(`<b dir="auto">${esc(f.name)}</b> gave you 200 points!`, POWERUPS.gift.color, PW_ICON.gift); Sound.play('join'); }
+  },
+  startGlitch() {
+    if (reduceMotion) return; document.body.classList.add('glitching'); Sound.play('glitch'); vibrate([30, 30, 30, 30, 30]);
+    const glyphs = '#%&@$*!?<>/\\=+~';
+    clearInterval(this.scrT); clearTimeout(this.glitchT);
+    this.scrT = setInterval(() => $$('.ans-text,.pq-text').forEach(el => { if (el.dataset.orig == null) el.dataset.orig = el.innerHTML; const txt = el.textContent; el.textContent = [...txt].map(ch => ch !== ' ' && Math.random() < 0.28 ? glyphs[ri(glyphs.length)] : ch).join(''); }), 160);
+    this.glitchT = setTimeout(() => this.endGlitch(), 5000);
+  },
+  endGlitch() { clearInterval(this.scrT); clearTimeout(this.glitchT); document.body.classList.remove('glitching'); $$('[data-orig]').forEach(el => { el.innerHTML = el.dataset.orig; delete el.dataset.orig; }); },
+  viewKey() {
+    const s = this.pub, m = this.me; if (!s || !m) return 'none';
+    const la = this.localAns && this.localAns.qi === s.qi && s.phase === 'question';
+    const late = ['reveal', 'board', 'podium'].includes(s.phase) ? m.rank + ':' + m.n + ':' + !!m.stats + ':' + (m.lastPick || '') : '';
+    return [s.hs, s.phase, s.qi, m.answered || la, m.retry && !la, m.used || (this.pendingUse ? this.pendingUse.pw : ''), (m.hide || []).join(','), m.draft ? m.draft.join(',') : '', m.picked || !!this.pendingPick, (m.inv || []).join(','), !!m.result, late].join('|');
+  },
+  update() {
+    if (!this.me || !this.pub) return;
+    const k = this.viewKey();
+    if (k !== this.view) { this.view = k; this.renderPhase(); }
+    else this.partial();
+  },
+  partial() { const p = $('#ptsNum'); if (p) p.textContent = fmtN(this.me.score); const n = $('#lobbyN'); if (n) n.textContent = this.pub.n; },
+  ptop() {
+    const m = this.me;
+    return `<div class="ptop"><span class="me">${avw(m.av)}<b dir="auto">${esc(m.name)}</b></span><span class="pts" id="ptsNum" aria-label="Your score">${fmtN(m.score)}</span>
+      <button class="icon-btn" data-act="p-sound" aria-label="${Sound.on ? 'Turn sound off' : 'Turn sound on'}">${Sound.on ? ICON.soundOn : ICON.soundOff}</button></div>`;
+  },
+  renderPhase() {
+    cancelAnimationFrame(this.raf);
+    const s = this.pub, m = this.me;
+    if (s.phase === 'closed') { this.renderEnd('The host closed this game', 'Ask for the new code to join the next one.'); return; }
+    if (s.phase === 'lobby') return this.renderWait();
+    if (s.phase === 'intro') return this.renderGetReady();
+    if (s.phase === 'question') { const la = this.localAns && this.localAns.qi === s.qi; return (m.answered || la) ? this.renderLocked() : this.renderQuestion(); }
+    if (s.phase === 'reveal') return this.renderResult();
+    if (s.phase === 'board') return this.renderDraft();
+    if (s.phase === 'podium') return this.renderFinal();
+  },
+  renderWait() {
+    const s = this.pub, m = this.me;
+    app.innerHTML = `<div class="pwrap">${this.ptop()}<div class="center">
+      <div class="spot"><span class="avw bob" id="waveAv">${avatarSVG(m.av)}</span></div>
+      <h1 class="bigtitle">You're in!</h1>
+      <p class="sub">Find <b dir="auto">${esc(m.name)}</b> on the big screen. The game starts when the host is ready.</p>
+      <p class="rankpill"><span id="lobbyN">${s.n}</span> in the lobby</p>
+      <button class="wave-btn" data-act="p-wave">${ICON.hand.replace('<svg', '<svg width="20" height="20" style="vertical-align:-4px;margin-right:6px"')}Wave on the big screen</button>
+      <button class="link-back" style="align-self:center" data-act="p-edit">Change name or character</button>
+    </div></div>`;
+  },
+  renderGetReady() {
+    const s = this.pub;
+    app.innerHTML = `<div class="pwrap">${this.ptop()}<div class="center">
+      ${s.cat ? catChip(s.cat) : ''}<h1 class="bigtitle">Question ${s.qi + 1}</h1><p class="sub">of ${s.total}. Get ready…</p>
+      <div class="countdown still" style="width:120px"><span>${ICON.bulb.replace('<svg', '<svg width="54" height="54"')}</span></div>
+      ${this.me.inv.length && s.powers ? `<p class="sub">Your power-ups are ready to use.</p>` : ''}
+    </div></div>`;
+  },
+  packHTML(usable) {
+    const m = this.me; if (!this.pub.powers) return '';
+    const locked = !usable || !!m.used || !!this.pendingUse;
+    const slots = [0, 1, 2].map(i => { const id = m.inv[i]; if (!id) return `<div class="slot empty">Empty</div>`; const p = POWERUPS[id]; return `<button class="slot" style="--pc:${p.color}" data-act="p-power" data-id="${id}" ${locked ? 'disabled' : ''}>${PW_ICON[id]}<span>${esc(p.name)}</span></button>`; }).join('');
+    return `<section class="pack" aria-label="Your power-ups"><div class="pack-head"><b>Power-ups</b><span>${m.inv.length ? 'One per question' : 'Win one after each question'}</span></div><div class="slots">${slots}</div></section>`;
+  },
+  activeHTML() {
+    const id = this.me.used || (this.pendingUse && this.pendingUse.pw); if (!id) return '';
+    const p = POWERUPS[id];
+    return `<div class="active-pw" style="--pc:${p.color}">${PW_ICON[id]}<span>${esc(p.name)} is on</span></div>`;
+  },
+  renderQuestion() {
+    const s = this.pub, m = this.me, retry = m.retry;
+    const hide = new Set(m.hide || []); if (retry && m.wrong != null) hide.add(m.wrong);
+    const long = s.opts.some(o => o.length > 22), frozen = (m.used || (this.pendingUse && this.pendingUse.pw)) === 'freeze';
+    app.innerHTML = `<div class="pwrap ${frozen ? 'frozen' : ''}">${this.ptop()}
+      <div class="tbar" id="tbarW"><i id="tbar"></i></div>
+      ${this.activeHTML()}
+      ${retry ? `<div class="banner good">${PW_ICON.immunity}<span>Immunity saved you. Try again!</span></div>` : ''}
+      <h2 class="pq-text">${fmtQ(s.text)}</h2>
+      <div class="answers ${long ? 'long' : ''}">${s.opts.map((o, i) => `<button class="ans t${i}" data-act="p-answer" data-i="${i}" ${hide.has(i) ? 'disabled' : ''}><span class="let">${'ABCD'[i]}</span><span class="ans-text">${esc(o)}</span></button>`).join('')}</div>
+      ${retry ? '' : this.packHTML(true)}
+    </div>`;
+    this.loop();
+  },
+  loop() {
+    const tick = () => {
+      const bar = $('#tbar'); if (!bar || !this.pub || this.pub.phase !== 'question') return;
+      const rem = Math.max(0, this.deadline - Date.now()), frac = rem / (this.pub.limit || 20000);
+      bar.style.transform = `scaleX(${frac.toFixed(4)})`; $('#tbarW').classList.toggle('low', rem < 5000);
+      this.raf = requestAnimationFrame(tick);
+    };
+    this.raf = requestAnimationFrame(tick);
+  },
+  renderLocked() {
+    const s = this.pub, m = this.me, c = m.answered ? m.choice : this.localAns ? this.localAns.c : null;
+    const lines = ['Locked in!', 'Nice and fast!', 'Bold choice!', 'Fingers crossed!'];
+    app.innerHTML = `<div class="pwrap">${this.ptop()}
+      <div class="tbar" id="tbarW"><i id="tbar"></i></div>
+      <div class="center">
+        ${c != null ? `<div class="ans t${c}" style="width:100%;min-height:80px;pointer-events:none"><span class="let">${'ABCD'[c]}</span><span class="ans-text">${esc(s.opts[c])}</span></div>` : ''}
+        <h1 class="bigtitle">${pick(lines)}</h1>
+        <p class="sub">Waiting for the others…</p>
+        ${this.activeHTML()}
+      </div></div>`;
+    this.loop();
+  },
+  renderResult() {
+    const s = this.pub, m = this.me, r = m.result;
+    if (!r) { app.innerHTML = `<div class="pwrap">${this.ptop()}<div class="center"><h1 class="bigtitle">Look at the big screen</h1><p class="sub">You'll play from the next question.</p></div></div>`; return; }
+    const verdict = r.ok ? ['good', pick(['Correct!', 'Nailed it!', 'Brilliant!'])] : r.none ? ['meh', 'Time’s up!'] : ['bad', pick(['Not quite', 'So close!', 'Oops!'])];
+    app.innerHTML = `<div class="pwrap">${this.ptop()}<div class="center">
+      <h1 class="verdict ${verdict[0]}">${verdict[1]}</h1>
+      <div class="gainbig" style="color:${r.gained > 0 ? 'var(--good)' : r.gained < 0 ? 'var(--bad)' : 'var(--muted)'}">${r.gained > 0 ? '+' : ''}${fmtN(r.gained)}</div>
+      ${!r.ok ? `<p class="sub">The answer was <b style="color:#fff">${'ABCD'[s.correct]}: ${esc(s.opts[s.correct])}</b></p>` : ''}
+      ${r.lines.length ? `<div class="lines">${r.lines.map(([a, b]) => `<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('')}</div>` : ''}
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><span class="rankpill">${ordinal(m.rank)} of ${m.n}</span>${m.streak >= 2 ? `<span class="rankpill"><span class="flame" style="font-size:18px">${ICON.flame}${m.streak}</span> streak</span>` : ''}</div>
+      <p class="sub" style="font-size:15px">${esc(s.why || '')}</p>
+    </div></div>`;
+  },
+  renderDraft() {
+    const m = this.me, s = this.pub;
+    const picked = m.picked || !!this.pendingPick;
+    let body;
+    if (!s.powers) body = `<h1 class="bigtitle">${ordinal(m.rank)} place</h1><p class="sub">Next question coming up. Watch the big screen.</p>`;
+    else if (!m.draft) body = `<h1 class="bigtitle">Leaderboard time</h1><p class="sub">Watch the big screen.</p>`;
+    else if (!picked) body = `<h1 class="bigtitle">Pick a power-up</h1><p class="sub">${m.inv.length >= 3 ? 'Your pack is full, so your oldest power-up will be swapped out.' : 'It goes into your pack for the next questions.'}</p><div class="cards">${m.draft.map((id, i) => pwCard(id, `data-act="p-pick" data-i="${i}"`)).join('')}</div>`;
+    else { const id = m.lastPick || (this.pendingPick && m.draft[this.pendingPick.i]); body = `<h1 class="bigtitle">Added to your pack!</h1>${id ? `<div class="cards">${pwCard(id, '', 'div')}</div>` : ''}<p class="sub">You're ${ordinal(m.rank)} of ${m.n}. Next question soon…</p>`; }
+    app.innerHTML = `<div class="pwrap">${this.ptop()}<div class="center">${body}</div>${s.powers ? this.packHTML(false) : ''}</div>`;
+  },
+  renderFinal() {
+    const m = this.me, st = m.stats || { correct: 0, total: 0, best: 0 };
+    const mc = m.rank === 1 ? '#FFC42E' : m.rank === 2 ? '#DDE3F0' : m.rank === 3 ? '#F09A5B' : '#fff';
+    const title = m.rank === 1 ? 'You won!' : m.rank <= 3 ? 'On the podium!' : 'Great game!';
+    app.innerHTML = `<div class="pwrap">${this.ptop()}<div class="center">
+      <div class="spot"><span class="avw bob">${avatarSVG(m.av)}</span></div>
+      <div class="medal" style="--mc:${mc}">${m.rank}</div>
+      <h1 class="bigtitle">${title}</h1>
+      <p class="sub">You finished ${ordinal(m.rank)} of ${m.n} with <b style="color:#fff">${fmtN(m.score)}</b> points.</p>
+      <div class="lines"><div><span>Correct answers</span><b>${st.correct} of ${st.total}</b></div><div><span>Best streak</span><b>${st.best}</b></div></div>
+      <p class="sub">Stay here. If the host starts another round, you're already in.</p>
+    </div></div>`;
+    if (m.rank <= 3) Confetti.burst(120);
+  },
+  renderEnd(title, text) {
+    this.view = 'end';
+    app.innerHTML = `<div class="pwrap"><div class="center"><h1 class="bigtitle">${esc(title)}</h1><p class="sub">${esc(text)}</p><button class="btn xl" data-act="go-join">Join another game</button><button class="link-back" style="align-self:center" data-act="go-home">Home</button></div></div>`;
+  },
+  openSheet(id) {
+    const p = POWERUPS[id]; this.closeSheet();
+    const wrap = document.createElement('div'); wrap.id = 'sheetWrap';
+    wrap.innerHTML = `<div class="sheet-back" data-close="1"></div><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetT">
+      ${pwCard(id, '', 'div').replace('<b>', '<b id="sheetT">')}
+      <div class="row-btns"><button class="btn ghost" data-close="1">Keep it</button><button class="btn" id="useBtn">Use it now</button></div></div>`;
+    document.body.appendChild(wrap);
+    wrap.addEventListener('click', e => { if (e.target.closest('[data-close]')) this.closeSheet(); });
+    $('#useBtn').addEventListener('click', () => { this.closeSheet(); this.usePower(id); });
+    $('#useBtn').focus();
+  },
+  closeSheet() { const w = $('#sheetWrap'); if (w) w.remove(); },
+  usePower(id) {
+    const s = this.pub, m = this.me; if (!s || s.phase !== 'question' || m.used || this.pendingUse || m.answered) return;
+    this.pendingUse = { qi: s.qi, pw: id }; this.send({ t: 'use', qi: s.qi, pw: id }); Sound.play('power'); vibrate(40); this.update();
+  },
+};
+Actions['p-find'] = () => { const i = $('#codeIn'); if (i) Player.find(i.value); };
+Actions['p-join'] = () => Player.join();
+Actions['p-randname'] = () => { const n = randomName(); Player.name = n; const i = $('#nameIn'); if (i) i.value = n; Sound.play('tap'); };
+Actions['p-tab'] = el => { Player.tab = el.dataset.k; $$('.tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b === el)); Player.renderOpts(); };
+Actions['p-opt'] = el => { Player.setAv({ ...Player.av, [Player.tab]: +el.dataset.i }); Sound.play('tap'); };
+Actions['p-randav'] = () => { Player.setAv(randomAv()); Sound.play('join'); };
+Actions['p-wave'] = () => { Player.send({ t: 'wave' }); const a = $('#waveAv'); if (a) { a.classList.remove('bob'); a.style.animation = 'jump .7s ease-out'; setTimeout(() => { a.style.animation = ''; a.classList.add('bob'); }, 700); } vibrate(30); };
+Actions['p-edit'] = () => { Player.joined = false; Player.me = null; Player.view = 'create'; Player.renderCreate(); };
+Actions['p-sound'] = el => { Sound.ensure(); Sound.on = !Sound.on; el.innerHTML = Sound.on ? ICON.soundOn : ICON.soundOff; el.setAttribute('aria-label', Sound.on ? 'Turn sound off' : 'Turn sound on'); };
+Actions['p-power'] = el => Player.openSheet(el.dataset.id);
+Actions['p-answer'] = el => {
+  const P = Player, s = P.pub, m = P.me; if (!s || s.phase !== 'question' || !m || m.answered) return;
+  const c = +el.dataset.i, att = m.att || 0;
+  P.pending = { qi: s.qi, c, att }; P.localAns = { qi: s.qi, c };
+  P.send({ t: 'answer', qi: s.qi, c, att }); Sound.play('tap'); vibrate(30); P.update();
+};
+Actions['p-pick'] = el => {
+  const P = Player, s = P.pub, m = P.me; if (!s || s.phase !== 'board' || !m || !m.draft || m.picked || P.pendingPick) return;
+  P.pendingPick = { qi: s.qi, i: +el.dataset.i }; P.send({ t: 'pick', qi: s.qi, i: +el.dataset.i }); Sound.play('power'); vibrate(40); P.update();
+};
+
+
+App.init();
+</script>
+
+</body>
+</html>
