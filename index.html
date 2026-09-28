@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#15113A">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Clause &amp; Effect">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Clause &amp; Effect</title>
 <meta name="description" content="A live conjunctions quiz battle for Grade 10: host on a big screen, join from phones, build a character and grab power-ups.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&amp;family=Nunito:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800&amp;display=swap">
@@ -361,6 +369,20 @@ legend{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:
 .lines{width:100%;background:var(--stage-2);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:6px}
 .lines div{display:flex;justify-content:space-between;gap:10px;font-weight:800;color:var(--muted)}
 .lines div b{color:#fff;font-variant-numeric:tabular-nums}
+.earn{margin:0;display:inline-flex;align-items:center;gap:8px;border-radius:14px;padding:8px 14px;font-weight:900;font-size:16px}
+.earn svg{width:22px;height:22px}
+.earn.yes{background:var(--mint);color:var(--ink)}
+.earn.no{background:rgba(255,255,255,.08);color:var(--muted)}
+.link-label{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;color:rgba(23,19,47,.65)}
+.link-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.join-how .copy{display:inline-flex;align-items:center;gap:6px}
+.join-how .copy svg{width:18px;height:18px}
+.install-slot{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--faint);font-weight:800;font-size:14px;min-height:0}
+.install-slot:empty{display:none}
+.install-btn{border:0;border-radius:14px;padding:10px 18px;min-height:46px;background:#fff;color:var(--ink);font-weight:900;font-size:16px;display:inline-flex;align-items:center;gap:8px;box-shadow:0 5px 0 rgba(0,0,0,.3)}
+.install-btn svg{width:20px;height:20px}
+.ios-tip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border-radius:14px;padding:8px 14px;color:var(--muted)}
+.ios-tip svg{width:20px;height:20px;flex:none}
 .rankpill{background:#fff;color:var(--ink);border-radius:99px;padding:8px 18px;font-weight:900;font-size:18px}
 .cards{display:grid;gap:12px;width:100%}
 .pw-card{border:3px solid var(--pc);background:var(--stage-2);border-radius:22px;padding:14px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;align-items:center;text-align:left;color:#fff;animation:flipin .5s ease-out both;box-shadow:0 6px 0 rgba(0,0,0,.25)}
@@ -548,6 +570,8 @@ const ICON = {
   flame: I('<path d="M12 22c4 0 7-3 7-7 0-4.5-3.5-6.5-4.5-10.5-2 2-3 4-3 6.3-1.2-.8-2-2.2-2.2-3.8C6.7 9.4 5 11.8 5 15c0 4 3 7 7 7z" fill="currentColor" stroke="none"/>'),
   hand: I('<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10.5V4a1.5 1.5 0 0 1 3 0v7M14 10.5V5.5a1.5 1.5 0 0 1 3 0V13c0 4.5-2.5 8-6.5 8S5 18 4.5 15.5L3.8 12a1.4 1.4 0 0 1 2.5-1L8 13"/>'),
   users: I('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.8a3.3 3.3 0 0 1 0 6.4M18 14.8c1.9.7 3 2.4 3.5 5.2"/>'),
+  share: I('<path d="M12 3v12M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>'),
+  install: I('<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>'),
   copy: I('<rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>'),
   bot: I('<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M9.5 17h5"/>'),
 };
@@ -1169,9 +1193,9 @@ const Game = {
   afterBoard() {
     if (!this.settings.powers) { this.nextRound(); return; }
     const r = this.ranked();
-    r.forEach((p, i) => { p.draft = drawPowerups(r.length > 1 ? i / (r.length - 1) : 0); });
-    for (const p of r) if (p.bot) this.addToPack(p, pick(p.draft));
-    this.queue = this.humans().slice().sort((a, b) => this.rankOf(b) - this.rankOf(a));
+    r.forEach((p, i) => { p.draft = p.result && p.result.ok ? drawPowerups(r.length > 1 ? i / (r.length - 1) : 0) : null; });
+    for (const p of r) if (p.bot && p.draft) this.addToPack(p, pick(p.draft));
+    this.queue = this.humans().filter(p => p.draft).sort((a, b) => this.rankOf(b) - this.rankOf(a));
     this.nextDraft();
   },
   addToPack(p, id) { if (p.inv.length >= 3) p.inv.shift(); p.inv.push(id); p.lastPick = id; },
@@ -1283,10 +1307,14 @@ const Game = {
         <span class="gain ${g < 0 ? 'neg' : ''}">${g > 0 ? '+' + fmtN(g) : g < 0 ? fmtN(g) : ''}</span>
         <span class="sc" data-to="${p.score}" data-from="${Math.max(0, p.score - g)}">${fmtN(Math.max(0, p.score - g))}</span></li>`;
     }).join('');
-    const next = this.settings.powers ? 'Pick power-ups' : 'Next question';
-    const side = this.settings.powers
-      ? `<aside class="side-card"><h3>Up next: power-ups</h3><p>Each player picks one of three power-up cards. Players lower on the leaderboard get better cards.</p><div class="pw-mini">${Object.keys(POWERUPS).map(id => `<span style="--pc:${POWERUPS[id].color}" title="${esc(POWERUPS[id].name)}">${PW_ICON[id]}</span>`).join('')}</div></aside>`
-      : `<aside class="side-card"><h3>Up next</h3><p>Question ${this.qi + 2} of ${this.questions.length}</p></aside>`;
+    const earners = this.humans().filter(p => p.result && p.result.ok);
+    const next = this.settings.powers && earners.length ? 'Pick power-ups' : 'Next question';
+    const names = earners.map(p => `<b dir="auto">${esc(p.name)}</b>`).join(', ');
+    const side = !this.settings.powers
+      ? `<aside class="side-card"><h3>Up next</h3><p>Question ${this.qi + 2} of ${this.questions.length}</p></aside>`
+      : earners.length
+        ? `<aside class="side-card"><h3>Up next: power-ups</h3><p>Only right answers earn a pick. ${names} ${earners.length > 1 ? 'each choose' : 'chooses'} one of three cards.</p><div class="pw-mini">${Object.keys(POWERUPS).map(id => `<span style="--pc:${POWERUPS[id].color}" title="${esc(POWERUPS[id].name)}">${PW_ICON[id]}</span>`).join('')}</div></aside>`
+        : `<aside class="side-card"><h3>No power-ups this time</h3><p>Only players who answer correctly get to pick a power-up. Get the next one right!</p></aside>`;
     this.frame(`<main class="boardwrap"><section><h2 class="board-title">Leaderboard</h2><ol class="board">${rows}</ol>${r.length > 8 ? `<p class="score-line">+ ${r.length - 8} more</p>` : ''}</section>${side}</main>`,
       `<span class="hint"><kbd>Space</kbd> continue</span><span class="spacer"></span><button class="btn xl" data-act="g-after-board" data-primary>${next} ${ICON.next}</button>`);
     const els = $$('.sc[data-to]'), t0 = performance.now(), D = 1100;
@@ -1298,7 +1326,7 @@ const Game = {
     this.frame(`<main class="draft">
       <div class="who big">${avw(p.av, 'bob')}<div><b dir="auto">${esc(p.name)}</b><span>${ordinal(this.rankOf(p))} place · ${fmtN(p.score)} points</span></div></div>
       <h2 class="bigtitle">${multi ? `<span dir="auto">${esc(p.name)}</span>, pick a power-up` : 'Pick a power-up'}</h2>
-      <p class="sub">${full ? 'Your pack is full, so your oldest power-up will be swapped out.' : 'It goes into your pack. Use it on a later question, before you answer.'}</p>
+      <p class="sub">Right answer, so you earn a card! ${full ? 'Your pack is full, so your oldest power-up will be swapped out.' : 'Use it on a later question, before you answer.'}</p>
       <div class="cards three">${p.draft.map((id, i) => pwCard(id, `data-act="g-pick" data-i="${i}"`)).join('')}</div>
       ${p.inv.length ? `<p class="sub small">In your pack: ${p.inv.map(id => esc(POWERUPS[id].name)).join(', ')}</p>` : ''}
     </main>`, `<span class="hint">Click a card or press <kbd>1</kbd>–<kbd>3</kbd></span><span class="spacer"></span><button class="btn ghost" data-act="g-skip-pick">Skip</button>`);
@@ -1534,20 +1562,49 @@ const App = {
     if (!ok && !bar && (Host.active || Player.active)) { bar = document.createElement('div'); bar.id = 'netbar'; bar.className = 'netbar'; bar.textContent = 'Connection lost. Reconnecting…'; document.body.appendChild(bar); }
     if (ok && bar && !Player.lostHost) bar.remove();
   },
-  joinHow() {
+  joinUrl(code) { return location.origin + location.pathname + '?join=' + code; },
+  canLink() { return /^https?:$/.test(location.protocol) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname); },
+  joinHow(code) {
     const k = Host.net ? Host.net.kind : 'online';
     if (k === 'local') return `<span><b>Test mode:</b> open this page in another tab of this browser, tap <b>Join a game</b> and type the code.</span>`;
-    if (/^https?:$/.test(location.protocol) && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
-      const url = location.origin + location.pathname;
-      return `<span>On your phone, open</span><span class="url">${esc(url)}</span><button class="copy" data-act="copy-link">Copy link</button><span>then tap <b>Join a game</b>. Or scan:</span>`;
+    if (this.canLink()) {
+      const url = this.joinUrl(code);
+      return `<span class="link-label">Game link</span><span class="url" id="joinUrl">${esc(url)}</span>
+        <div class="link-btns"><button class="copy" data-act="copy-link">${ICON.copy} Copy link</button>${navigator.share ? `<button class="copy" data-act="share-link">${ICON.share} Share</button>` : ''}</div>
+        <span>Players open the link or scan the code:</span>`;
     }
     return `<span>On each phone, open this game (the website, or the game file in Chrome on Android), tap <b>Join a game</b> and type the code.</span>`;
   },
   init() {
     const j = (this.params.get('join') || '').toUpperCase();
-    if (/^[A-Z]{4}$/.test(j) && !this.inClaude) Player.start(j); else Game.init();
+    if (/^[A-Z]{4}$/.test(j) && !this.inClaude) Player.start(j);
+    else { Game.init(); if (!this.inClaude && this.params.has('host')) Host.setup(); else if (!this.inClaude && this.params.get('go') === 'join') Player.start(''); }
+    Install.init();
   },
 };
+
+/* ---------- installable game (web version only) ---------- */
+const Install = {
+  evt: null,
+  web() { return !App.inClaude && !!document.querySelector('link[rel="manifest"]') && location.protocol === 'https:'; },
+  standalone() { try { return matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || navigator.standalone === true; } catch (e) { return false; } },
+  ios() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); },
+  init() {
+    if (!this.web()) return;
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+    addEventListener('beforeinstallprompt', e => { e.preventDefault(); this.evt = e; this.show(); });
+    addEventListener('appinstalled', () => { this.evt = null; this.show(); toast('Clause & Effect is installed. Open it from your home screen.', '#3DDC97', ICON.check); });
+    this.show();
+  },
+  show() {
+    const slot = $('#installSlot'); if (!slot) return;
+    if (!this.web() || this.standalone()) { slot.innerHTML = ''; return; }
+    if (this.evt) slot.innerHTML = `<button class="install-btn" data-act="install">${ICON.install} Install the game</button><span>Adds Clause &amp; Effect to your home screen like an app.</span>`;
+    else if (this.ios()) slot.innerHTML = `<span class="ios-tip">${ICON.share}<span>To install on iPhone: tap <b>Share</b>, then <b>Add to Home Screen</b>.</span></span>`;
+    else slot.innerHTML = '';
+  },
+};
+Actions['install'] = async () => { const e = Install.evt; if (!e) return; try { e.prompt(); await e.userChoice; } catch (err) {} Install.evt = null; Install.show(); };
 
 const Home = {
   render() {
@@ -1564,9 +1621,11 @@ const Home = {
         <button class="choice c-join" data-act="go-join"><span class="ci">${ICON.phone}</span><b>Join a game</b><small>Answer and use power-ups on your phone</small></button>` : ''}
         <button class="choice c-local" data-act="g-setup" ${online ? '' : 'data-primary'}><span class="ci">${ICON.users}</span><b>Play on this device</b><small>Take turns on one screen, with computer rivals</small></button>
       </div>
-      <ol class="how">${online ? '<li>Host opens a lobby</li><li>Phones join with the code</li><li>Answer fast and grab power-ups</li>' : '<li>Make your characters</li><li>Take turns answering</li><li>Grab power-ups and win</li>'}</ol>
+      <ol class="how">${online ? '<li>Host opens a lobby</li><li>Phones join with the link or code</li><li>Right answers earn power-ups</li>' : '<li>Make your characters</li><li>Take turns answering</li><li>Right answers earn power-ups</li>'}</ol>
       ${online ? '' : '<p class="sub small">Playing with phones works in the website version of this game.</p>'}
+      <div id="installSlot" class="install-slot"></div>
     </main>`;
+    Install.show();
   },
 };
 Actions['go-home'] = () => Game.home();
@@ -1600,6 +1659,15 @@ const Host = {
   /* ---- setup ---- */
   setup() {
     Player.stop(); Game.clear(); Game.phase = 'off'; this.active = true; this.phase = 'setup';
+    if (!this.loaded) {
+      this.loaded = true; const d = store.get('ce-host-settings');
+      if (d && typeof d === 'object') {
+        const t = this.settings;
+        if ([8, 12, 20, 40].includes(d.count)) t.count = d.count; if ([10, 20, 30].includes(d.time)) t.time = d.time;
+        if (Array.isArray(d.cats)) { const c = d.cats.filter(k => CATS[k]); if (c.length) t.cats = c; }
+        if (typeof d.powers === 'boolean') t.powers = d.powers; if (typeof d.sound === 'boolean') t.sound = d.sound;
+      }
+    }
     const s = this.settings, counts = k => QUESTIONS.filter(q => q.cat === k).length;
     const radio = (name, v, label, on) => `<label><input type="radio" name="${name}" value="${v}" ${on ? 'checked' : ''}><span>${label}</span></label>`;
     app.innerHTML = `
@@ -1625,6 +1693,7 @@ const Host = {
     if (!cats.length) { $('#setupErr').textContent = 'Pick at least one topic.'; return; }
     const val = n => { const el = $(`input[name="${n}"]:checked`, f); return el ? +el.value : null; };
     s.count = val('count') || 12; s.time = val('time') || 20; s.cats = cats; s.powers = $('#optPowers').checked; s.sound = $('#optSound').checked;
+    store.set('ce-host-settings', s);
     const b = $('#openBtn'); if (b) { b.disabled = true; b.textContent = 'Connecting to the game server\u2026'; }
     this.open().catch(err => {
       this.active = true; this.phase = 'setup';
@@ -1830,8 +1899,8 @@ const Host = {
     this.phase = 'board';
     if (this.settings.powers) {
       const r = this.ranked();
-      r.forEach((p, i) => { p.draft = drawPowerups(r.length > 1 ? i / (r.length - 1) : 0); p.picked = false; });
-      for (const p of r) if (p.bot) this.botT.push(setTimeout(() => this.onPick(p, { qi: this.qi, i: ri(3) }), rnd(900, 2800)));
+      r.forEach((p, i) => { p.picked = false; p.draft = p.result && p.result.ok ? drawPowerups(r.length > 1 ? i / (r.length - 1) : 0) : null; });
+      for (const p of r) if (p.bot && p.draft) this.botT.push(setTimeout(() => this.onPick(p, { qi: this.qi, i: ri(3) }), rnd(900, 2800)));
     }
     this.publish(); this.sendAllMe(); this.renderBoard();
   },
@@ -1915,7 +1984,7 @@ const Host = {
       <section class="join-card" aria-label="How to join">
         <p class="eyebrow">Game code</p>
         <div class="code-tiles" aria-label="Game code ${[...this.code].join(' ')}">${[...this.code].map((ch, i) => `<span style="--r:${i % 2 ? 3 : -3}deg">${ch}</span>`).join('')}</div>
-        <div class="join-how">${App.joinHow()}</div>
+        <div class="join-how">${App.joinHow(this.code)}</div>
         <div class="qr" id="qrBox" hidden></div>
       </section>
       <section class="lobby-players">
@@ -2021,8 +2090,10 @@ const Host = {
         <span class="gain ${g < 0 ? 'neg' : ''}">${g > 0 ? '+' + fmtN(g) : g < 0 ? fmtN(g) : ''}</span>
         <span class="sc" data-to="${p.score}" data-from="${Math.max(0, p.score - g)}">${fmtN(Math.max(0, p.score - g))}</span></li>`;
     }).join('');
-    const side = this.settings.powers ? `<aside class="side-card"><h3>Power-up draft</h3><p>Everyone is picking one power-up on their phone right now.</p><div class="meter"><i id="draftBar" style="width:0%"></i></div><p id="draftTxt">0 picked</p><div class="pw-mini" id="draftMini"></div></aside>`
-      : `<aside class="side-card"><h3>Next up</h3><p>Question ${this.qi + 2} of ${this.questions.length}</p></aside>`;
+    const earners = [...this.players.values()].filter(p => p.draft).length;
+    const side = !this.settings.powers ? `<aside class="side-card"><h3>Next up</h3><p>Question ${this.qi + 2} of ${this.questions.length}</p></aside>`
+      : earners ? `<aside class="side-card"><h3>Power-up draft</h3><p>Only right answers earn a pick. ${earners} player${earners > 1 ? 's are' : ' is'} choosing a power-up on their phone.</p><div class="meter"><i id="draftBar" style="width:0%"></i></div><p id="draftTxt">0 picked</p><div class="pw-mini" id="draftMini"></div></aside>`
+      : `<aside class="side-card"><h3>No power-ups this time</h3><p>Nobody got that one right. Only right answers earn a power-up pick.</p></aside>`;
     this.frame(`<main class="boardwrap"><section><h2 class="board-title">Leaderboard</h2><ol class="board">${rows}</ol>${r.length > 8 ? `<p class="score-line">+ ${r.length - 8} more players</p>` : ''}</section>${side}</main>`,
       `<span class="hint"><kbd>Space</kbd> next question</span><span class="spacer"></span><button class="btn xl" data-act="h-next">Next question ${ICON.next}</button>`);
     this.countUp(); this.updateDraft();
@@ -2070,7 +2141,12 @@ Actions['h-new'] = () => { Host.stop(); Host.setup(); };
 Actions['h-sound'] = el => { Sound.ensure(); Sound.on = !Sound.on; Sound.music = Sound.on; Host.settings.sound = Sound.on; if (Sound.on && Host.phase !== 'podium') Music.start(); el.innerHTML = Sound.on ? ICON.soundOn : ICON.soundOff; el.setAttribute('aria-label', Sound.on ? 'Turn sound off' : 'Turn sound on'); };
 Actions['h-full'] = () => { try { if (document.fullscreenElement) document.exitFullscreen(); else { const p = document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); if (p && p.catch) p.catch(() => toast('Full screen isn’t available here.', '#7FB2FF')); } } catch (e) {} };
 Actions['h-end'] = el => { if (el.classList.contains('armed')) { Host.endGame(); return; } el.classList.add('armed'); el.setAttribute('aria-label', 'Tap again to end the game'); toast('Tap the red button again to end the game.', '#FF5566', ICON.stop); setTimeout(() => { el.classList.remove('armed'); el.setAttribute('aria-label', 'End the game now'); }, 3000); };
-Actions['copy-link'] = el => { const url = location.origin + location.pathname; const done = () => { el.textContent = 'Copied'; setTimeout(() => el.textContent = 'Copy link', 1600); }; try { navigator.clipboard.writeText(url).then(done, () => { const u = $('.join-how .url'); if (u) { const r = document.createRange(); r.selectNodeContents(u); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } }); } catch (e) {} };
+Actions['copy-link'] = el => {
+  const url = App.joinUrl(Host.code), label = el.innerHTML;
+  const selectIt = () => { const u = $('#joinUrl'); if (u) { const r = document.createRange(); r.selectNodeContents(u); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } };
+  try { navigator.clipboard.writeText(url).then(() => { el.innerHTML = `${ICON.check} Copied`; setTimeout(() => { el.innerHTML = label; }, 1600); }, selectIt); } catch (e) { selectIt(); }
+};
+Actions['share-link'] = () => { try { const p = navigator.share({ title: 'Clause & Effect', text: `Join my conjunctions quiz! Game code: ${Host.code}`, url: App.joinUrl(Host.code) }); if (p && p.catch) p.catch(() => {}); } catch (e) {} };
 
 /* =========================================================
    Player
@@ -2330,6 +2406,7 @@ const Player = {
       ${!r.ok ? `<p class="sub">The answer was <b style="color:#fff">${'ABCD'[s.correct]}: ${esc(s.opts[s.correct])}</b></p>` : ''}
       ${r.lines.length ? `<div class="lines">${r.lines.map(([a, b]) => `<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('')}</div>` : ''}
       <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><span class="rankpill">${ordinal(m.rank)} of ${m.n}</span>${m.streak >= 2 ? `<span class="rankpill"><span class="flame" style="font-size:18px">${ICON.flame}${m.streak}</span> streak</span>` : ''}</div>
+      ${s.powers && !s.last ? `<p class="earn ${r.ok ? 'yes' : 'no'}">${r.ok ? `${PW_ICON.gift}You earned a power-up pick!` : 'Only right answers earn a power-up pick.'}</p>` : ''}
       <p class="sub" style="font-size:15px">${esc(s.why || '')}</p>
     </div></div>`;
   },
@@ -2338,8 +2415,9 @@ const Player = {
     const picked = m.picked || !!this.pendingPick;
     let body;
     if (!s.powers) body = `<h1 class="bigtitle">${ordinal(m.rank)} place</h1><p class="sub">Next question coming up. Watch the big screen.</p>`;
+    else if (!m.draft && m.result && !m.result.ok) body = `<h1 class="bigtitle">No power-up this time</h1><p class="sub">Only right answers earn a pick. Get the next one right!</p><p class="rankpill">${ordinal(m.rank)} of ${m.n}</p>`;
     else if (!m.draft) body = `<h1 class="bigtitle">Leaderboard time</h1><p class="sub">Watch the big screen.</p>`;
-    else if (!picked) body = `<h1 class="bigtitle">Pick a power-up</h1><p class="sub">${m.inv.length >= 3 ? 'Your pack is full, so your oldest power-up will be swapped out.' : 'It goes into your pack for the next questions.'}</p><div class="cards">${m.draft.map((id, i) => pwCard(id, `data-act="p-pick" data-i="${i}"`)).join('')}</div>`;
+    else if (!picked) body = `<h1 class="bigtitle">Pick a power-up</h1><p class="sub">Right answer, so you earn a card! ${m.inv.length >= 3 ? 'Your pack is full, so your oldest power-up will be swapped out.' : 'It goes into your pack for the next questions.'}</p><div class="cards">${m.draft.map((id, i) => pwCard(id, `data-act="p-pick" data-i="${i}"`)).join('')}</div>`;
     else { const id = m.lastPick || (this.pendingPick && m.draft[this.pendingPick.i]); body = `<h1 class="bigtitle">Added to your pack!</h1>${id ? `<div class="cards">${pwCard(id, '', 'div')}</div>` : ''}<p class="sub">You're ${ordinal(m.rank)} of ${m.n}. Next question soon…</p>`; }
     app.innerHTML = `<div class="pwrap">${this.ptop()}<div class="center">${body}</div>${s.powers ? this.packHTML(false) : ''}</div>`;
   },

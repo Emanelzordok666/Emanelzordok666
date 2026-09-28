@@ -1,0 +1,22 @@
+{
+  "name": "Clause & Effect",
+  "short_name": "Clause&Effect",
+  "description": "A live conjunctions quiz battle for Grade 10. Host on a big screen, join from phones, build a character and earn power-ups.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#15113A",
+  "theme_color": "#15113A",
+  "categories": ["education", "games"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Host a game", "short_name": "Host", "url": "./?host", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Join a game", "short_name": "Join", "url": "./?go=join", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
