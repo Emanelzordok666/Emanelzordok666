@@ -383,6 +383,44 @@ legend{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:
 .install-btn svg{width:20px;height:20px}
 .ios-tip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border-radius:14px;padding:8px 14px;color:var(--muted)}
 .ios-tip svg{width:20px;height:20px;flex:none}
+.streak-pill{display:inline-flex;align-items:center;gap:3px;border-radius:99px;padding:4px 10px;background:rgba(255,138,61,.18);color:#FFB27A;font-weight:900;font-size:16px;font-style:normal;flex:none;font-variant-numeric:tabular-nums}
+.streak-pill svg{width:16px;height:16px}
+.streak-pill.hot{background:#FF8A3D;color:var(--ink);animation:pulse 1.2s ease-in-out infinite}
+.nm-row{display:flex!important;flex-direction:row!important;align-items:center;gap:8px;min-width:0}
+.streak-banner{display:flex;align-items:center;gap:10px;background:#FF8A3D;color:var(--ink);border-radius:18px;padding:10px 16px;font-weight:800;font-size:17px;text-align:left;animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+.streak-banner b{font-family:var(--font-display);font-weight:400;font-size:22px;margin-right:4px}
+.streak-banner svg{width:30px;height:30px;flex:none}
+.streak-banner.saved{background:#FFB27A}
+.streak-lost,.streak-start{display:flex;align-items:center;gap:8px;border-radius:14px;padding:8px 14px;font-weight:900;text-align:left}
+.streak-lost{background:rgba(255,85,102,.16);color:#FF9AA5}
+.streak-start{background:rgba(255,138,61,.12);color:#FFB27A}
+.streak-lost svg,.streak-start svg{width:20px;height:20px;flex:none}
+.streak-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.sk{display:inline-flex;align-items:center;gap:6px;border-radius:99px;padding:3px 14px 3px 3px;font-weight:800;background:#FF8A3D;color:var(--ink);animation:pop .4s ease-out both}
+.sk .avw{width:34px}
+.sk svg{width:18px;height:18px}
+.sk b{font-weight:900}
+.sk.off{background:rgba(255,255,255,.08);color:var(--muted)}
+.hq .sk{font-size:clamp(15px,1.5vw,19px);padding:4px 16px 4px 4px}
+.hq .sk .avw{width:clamp(34px,3vw,44px)}
+.hq .sk svg{width:22px;height:22px}
+.review{width:min(900px,100%);display:flex;flex-direction:column;gap:12px;text-align:left}
+.review h3{font-family:var(--font-display);font-weight:400;font-size:clamp(26px,3vw,36px);margin:0;text-align:center;line-height:1.1}
+.review > .sub{text-align:center}
+.rv{background:var(--stage-2);border:3px solid var(--line);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.rv-q{margin:0;font-weight:900;font-size:18px;color:#fff;line-height:1.35}
+.rv-q .fill{color:var(--ink);background:var(--mint);border-radius:6px;padding:0 6px}
+.rv-a{display:flex;flex-wrap:wrap;gap:8px}
+.rv-a span{border-radius:10px;padding:4px 10px;font-weight:900;font-size:14px}
+.rv-yours{background:rgba(255,85,102,.18);color:#FF9AA5}
+.rv-right{background:rgba(34,209,133,.18);color:#6FE8B0}
+.rv-why{margin:0;color:var(--muted);font-weight:700;font-size:15px;line-height:1.45}
+.rv-why b{color:var(--sun)}
+.rv-meta{margin:0;font-size:13px;color:var(--faint);font-weight:800}
+.rv-who{display:flex;flex-wrap:wrap;gap:6px}
+.rv-who span{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border-radius:99px;padding:2px 12px 2px 2px;font-size:13px;font-weight:800;color:var(--muted)}
+.rv-who .avw{width:26px}
+.rv-who b{color:#fff}
 .rankpill{background:#fff;color:var(--ink);border-radius:99px;padding:8px 18px;font-weight:900;font-size:18px}
 .cards{display:grid;gap:12px;width:100%}
 .pw-card{border:3px solid var(--pc);background:var(--stage-2);border-radius:22px;padding:14px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;align-items:center;text-align:left;color:#fff;animation:flipin .5s ease-out both;box-shadow:0 6px 0 rgba(0,0,0,.25)}
@@ -667,6 +705,32 @@ function drawPowerups(frac) {
   }
   return out;
 }
+function streakNote(r, streak) {
+  if (r.ok && streak >= 2) { const b = r.lines.find(l => /^Streak/.test(l[0])); return `<div class="streak-banner">${ICON.flame}<span><b>${streakTitle(streak)}</b> ${streak} in a row${b ? ` \u00b7 streak bonus ${esc(b[1])}` : ''}</span></div>`; }
+  if (r.saved) return `<div class="streak-banner saved">${PW_ICON.saver}<span>Streak Saver kept your ${r.saved}-question streak!</span></div>`;
+  if (r.lost) return `<div class="streak-lost">${ICON.flame}<span>Streak lost. You had ${r.lost} in a row.</span></div>`;
+  if (r.ok) return `<div class="streak-start">${ICON.flame}<span>Streak started. Get the next one right to keep it going!</span></div>`;
+  return '';
+}
+function fillBlank(q, answer) {
+  const segs = q.split('___'); if (segs.length < 2) return null;
+  let parts = answer.split(' \u2026 ');
+  if (parts.length !== segs.length - 1) parts = segs.length === 2 ? [answer] : null;
+  if (!parts) return null;
+  return segs.map((seg, i) => esc(seg) + (i < parts.length ? `<b class="fill">${esc(parts[i])}</b>` : '')).join('');
+}
+const streakTitle = n => n >= 5 ? 'Unstoppable!' : n >= 3 ? 'On fire!' : 'Nice streak!';
+function streakRowHTML(list) {
+  const hot = list.filter(x => x.streak >= 2).sort((a, b) => b.streak - a.streak).slice(0, 8);
+  const lost = list.filter(x => x.lost >= 2).slice(0, 6);
+  if (!hot.length && !lost.length) return '';
+  return `<div class="streak-row">${hot.map(x => `<span class="sk">${avw(x.av)}<span dir="auto">${esc(x.name)}</span>${ICON.flame}<b>${x.streak} in a row</b></span>`).join('')}${lost.map(x => `<span class="sk off">${avw(x.av)}<span dir="auto">${esc(x.name)}</span><span>lost a ${x.lost}-question streak</span></span>`).join('')}</div>`;
+}
+function reviewCardHTML(item, extra = '') {
+  const filled = fillBlank(item.q, item.right);
+  const yours = 'yours' in item ? `<span class="rv-yours">${item.yours == null ? 'You didn\u2019t answer' : 'You said: ' + esc(item.yours)}</span>` : '';
+  return `<article class="rv"><p class="rv-q">${filled || fmtQ(item.q)}</p><div class="rv-a">${yours}<span class="rv-right">Correct: ${esc(item.right)}</span></div><p class="rv-why"><b>Why?</b> ${esc(item.why)}</p>${extra}</article>`;
+}
 const ONLINE_DESC = { glitch: "Scramble everyone else's screen for 5 seconds.", freeze: 'Keep the full speed bonus, however long you take.' };
 const pwDesc = id => ((typeof Host !== 'undefined' && Host.active) || (typeof Player !== 'undefined' && Player.active)) && ONLINE_DESC[id] ? ONLINE_DESC[id] : POWERUPS[id].desc;
 const pwCard = (id, attrs = '', tag = 'button') => { const p = POWERUPS[id]; return `<${tag} class="pw-card" style="--pc:${p.color}" ${attrs}><span class="ico">${PW_ICON[id]}</span><span class="rar ${p.rarity}">${p.rarity}</span><b>${esc(p.name)}</b><small>${esc(pwDesc(id))}</small></${tag}>`; };
@@ -804,6 +868,7 @@ const Sound = {
       power: () => { this.tone(300, t, 0.3, 'square', 0.06, 4); this.tone(900, t + 0.2, 0.15, 'triangle', 0.08); },
       glitch: () => { for (let i = 0; i < 6; i++) this.tone(100 + Math.random() * 900, t + i * 0.05, 0.05, 'sawtooth', 0.05); },
       drum: () => { for (let i = 0; i < 18; i++) this.noise(t + i * 0.07, 0.06, 0.04 + i * 0.004, 300); },
+      streak: () => { [659, 784, 988, 1319].forEach((f, i) => this.tone(f, t + i * 0.06, 0.14, 'triangle', 0.09)); this.noise(t + 0.24, 0.25, 0.03, 6000); },
       fanfare: () => { [[523, 0], [659, 0.12], [784, 0.24], [1047, 0.36], [784, 0.56], [1047, 0.68]].forEach(([f, d]) => { this.tone(f, t + d, 0.22, 'square', 0.08); this.tone(f / 2, t + d, 0.22, 'triangle', 0.08); }); },
     };
     (S[name] || (() => {}))();
@@ -1046,7 +1111,7 @@ const Game = {
     Music.bpm = 116; Music.start(); keepAwake(); Sound.play('go');
     this.nextRound();
   },
-  newPlayer(id, name, av, bot) { return { id, name, av, bot, skill: 0.6, score: 0, streak: 0, best: 0, correct: 0, inv: [], used: null, hide: [], ans: null, result: null }; },
+  newPlayer(id, name, av, bot) { return { id, name, av, bot, skill: 0.6, score: 0, streak: 0, best: 0, correct: 0, inv: [], used: null, hide: [], ans: null, result: null, hist: [] }; },
   humans() { return this.players.filter(p => !p.bot); },
   ranked() { return this.players.slice().sort((a, b) => b.score - a.score || a.name.localeCompare(b.name)); },
   rankOf(p) { return this.ranked().indexOf(p) + 1; },
@@ -1166,7 +1231,7 @@ const Game = {
     this.prevRank = new Map(this.ranked().map((p, i) => [p.id, i + 1]));
     let right = 0;
     for (const p of this.players) {
-      const a = p.ans, pw = p.used, ok = !!(a && a.final && a.correct), lines = []; let gained = 0;
+      const a = p.ans, pw = p.used, ok = !!(a && a.final && a.correct), lines = []; let gained = 0, saved = 0, lost = 0;
       if (ok) {
         const streak = p.streak + 1, speed = pw === 'freeze' ? 500 : Math.round(500 * clamp(1 - a.ms / limit, 0, 1)), sb = Math.min(streak - 1, 5) * 60;
         lines.push(['Correct answer', '+500'], [pw === 'freeze' ? 'Speed bonus (frozen)' : 'Speed bonus', '+' + speed]); if (sb) lines.push(['Streak ×' + streak, '+' + sb]);
@@ -1178,15 +1243,17 @@ const Game = {
         gained = Math.round((500 + speed + sb) * mult); p.streak = streak; p.best = Math.max(p.best, streak); p.correct++; right++;
       } else {
         if (pw === 'jeopardy') { gained = -Math.min(500, p.score); lines.push(['Double Jeopardy', String(gained)]); }
-        if (pw === 'saver' && p.streak > 0) lines.push(['Streak saved', '×' + p.streak]); else if (pw !== 'saver') p.streak = 0;
+        if (pw === 'saver' && p.streak > 0) { lines.push(['Streak saved', '×' + p.streak]); saved = p.streak; } else { if (p.streak >= 2) lost = p.streak; p.streak = 0; }
       }
       p.score = Math.max(0, p.score + gained);
-      p.result = { ok, gained, lines, choice: a && a.final ? a.choice : null, none: !(a && a.final), pw };
+      p.result = { ok, gained, lines, choice: a && a.final ? a.choice : null, none: !(a && a.final), pw, streak: p.streak, saved, lost };
+      (p.hist || (p.hist = [])).push({ qi: this.qi, choice: a && a.final ? a.choice : null, ok });
     }
     this.qStats[this.qi] = { text: q.q, pct: this.players.length ? right / this.players.length : 0, right, total: this.players.length };
     this.qPlayed++; Music.bpm = 104;
     this.renderReveal(); Sound.play('reveal');
     const hs = this.humans(); if (hs.length === 1) this.later(() => Sound.play(hs[0].result.ok ? 'correct' : 'wrong'), 350);
+    if (hs.some(p => p.result.ok && p.streak >= 3)) this.later(() => Sound.play('streak'), 800);
   },
   afterReveal() {
     if (this.qi >= this.questions.length - 1) { this.podium(); return; }
@@ -1269,7 +1336,7 @@ const Game = {
     const active = p.used ? `<div class="active-pw" style="--pc:${POWERUPS[p.used].color}">${PW_ICON[p.used]}<span>${esc(POWERUPS[p.used].name)} is on${p.used === 'freeze' ? ': your timer is stopped' : ''}</span></div>` : '';
     this.frame(`<main class="hq turn ${frozen ? 'frozen' : ''}">
       <div class="turn-head">
-        <div class="who">${avw(p.av)}<div><b dir="auto">${esc(p.name)}</b><span>${this.order.length > 1 ? 'your turn' : `question ${this.qi + 1} of ${this.questions.length}`}</span></div></div>
+        <div class="who">${avw(p.av)}<div><span class="nm-row"><b dir="auto">${esc(p.name)}</b>${p.streak >= 1 ? `<i class="streak-pill ${p.streak >= 3 ? 'hot' : ''}" aria-label="Streak: ${p.streak} in a row">${ICON.flame}${p.streak}</i>` : ''}</span><span>${this.order.length > 1 ? 'your turn' : `question ${this.qi + 1} of ${this.questions.length}`}</span></div></div>
         <div class="ring ${frozen ? 'frozen' : ''}" id="ring"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="trk" cx="50" cy="50" r="44"/><circle class="arc" id="arc" cx="50" cy="50" r="44" stroke-dasharray="276.5" stroke-dashoffset="${(276.5 * (1 - rem / T)).toFixed(1)}" transform="rotate(-90 50 50)"/></svg><span id="ringNum">${Math.ceil(rem / 1000)}</span></div>
         <div class="who-score"><b>${fmtN(p.score)}</b><span>points</span></div>
       </div>
@@ -1296,6 +1363,7 @@ const Game = {
       <div class="tiles ${q.o.some(o => o.length > 26) ? 'long' : ''}">${tiles}</div>
       <div class="why"><span class="wi">${ICON.bulb}</span><span><b>Why?</b> ${esc(q.why)}</span></div>
       <div class="res-list">${res}</div>
+      ${streakRowHTML(this.players.map(p => ({ name: p.name, av: p.av, streak: p.result && p.result.ok ? p.streak : 0, lost: p.result ? p.result.lost : 0 })))}
     </main>`, `<span class="hint"><kbd>Space</kbd> continue</span><span class="spacer"></span>
       <button class="btn xl" data-act="g-after-reveal" data-primary>${last ? 'Final results' : 'Leaderboard'} ${ICON.next}</button>`);
   },
@@ -1333,6 +1401,14 @@ const Game = {
       ${p.inv.length ? `<p class="sub small">In your pack: ${p.inv.map(id => esc(POWERUPS[id].name)).join(', ')}</p>` : ''}
     </main>`, `<span class="hint">Click a card or press <kbd>1</kbd>–<kbd>3</kbd></span><span class="spacer"></span><button class="btn ghost" data-act="g-skip-pick">Skip</button>`);
   },
+  reviewSection() {
+    const hs = this.humans();
+    if (!this.qPlayed || !hs.length) return '';
+    const rows = this.questions.map((q, qi) => ({ q, qi, miss: hs.filter(p => p.hist.some(h => h.qi === qi && !h.ok)) })).filter(x => x.miss.length).sort((a, b) => b.miss.length - a.miss.length);
+    if (!rows.length) return `<section class="review"><h3>Perfect game!</h3><p class="sub">Nobody got a question wrong.</p></section>`;
+    const who = x => `<div class="rv-who">${x.miss.map(p => { const h = p.hist.find(y => y.qi === x.qi); return `<span>${avw(p.av)}<b dir="auto">${esc(p.name)}</b>${h.choice != null ? ' said ' + esc(x.q.o[h.choice]) : ' didn\u2019t answer'}</span>`; }).join('')}</div>`;
+    return `<section class="review"><h3>Review the mistakes</h3><p class="sub">Every question someone got wrong, with the right answer and why.</p>${rows.map(x => reviewCardHTML({ q: x.q.q, right: x.q.o[x.q.a], why: x.q.why }, who(x))).join('')}</section>`;
+  },
   renderPodium() {
     const r = this.ranked(), top = [r[1], r[0], r[2]];
     const crown = `<svg class="crown" viewBox="0 0 64 40" aria-hidden="true"><path d="M4 36L8 6L22 22L32 2L42 22L56 6L60 36Z" fill="#FFC42E" stroke="#8F5F00" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="26" r="4" fill="#FF4F7A"/></svg>`;
@@ -1346,6 +1422,7 @@ const Game = {
       <div class="podium">${pod(top[0], 2)}${pod(top[1], 1)}${pod(top[2], 3)}</div>
       ${r.length > 3 ? `<div class="rest">${r.slice(3).map((p, i) => `<span>${i + 4}. <b dir="auto">${esc(p.name)}</b> ${fmtN(p.score)}</span>`).join('')}</div>` : ''}
       <div class="stats">${stats}${hardest ? `<div class="stat"><b>${Math.round(hardest.pct * 100)}%</b><span>got the toughest one right: “${esc(hardest.text.replace(/___/g, '…'))}”</span></div>` : ''}</div>
+      ${this.reviewSection()}
     </main>`, `<button class="btn ghost" data-act="g-setup">Change players</button><span class="spacer"></span><button class="btn xl" data-act="g-again" data-primary>${ICON.play} Play again</button>`);
     Sound.play('drum');
     const show = (id, d) => this.later(() => { const el = $('#pod' + id); if (el) el.classList.add('show'); }, d);
@@ -1746,8 +1823,10 @@ const Host = {
       result: ['reveal', 'board', 'podium'].includes(this.phase) ? p.result : null,
       draft: this.phase === 'board' ? p.draft : null, picked: p.picked, lastPick: p.lastPick || null,
       stats: this.phase === 'podium' ? { correct: p.correct, total: this.qPlayed, best: p.best } : null,
+      review: this.phase === 'podium' ? this.reviewFor(p) : null,
     };
   },
+  reviewFor(p) { return (p.hist || []).filter(h => !h.ok).map(h => { const q = this.questions[h.qi]; return { q: q.q, right: q.o[q.a], yours: h.choice != null ? q.o[h.choice] : null, why: q.why }; }); },
   sendMe(p) { if (!p.bot && this.net) this.net.priv(p.pid, this.personal(p)); },
   sendAllMe() { for (const p of this.players.values()) this.sendMe(p); },
 
@@ -1844,7 +1923,7 @@ const Host = {
     if (!this.players.size) return;
     const pool = QUESTIONS.filter(q => this.settings.cats.includes(q.cat));
     this.questions = shuffle(pool).slice(0, this.settings.count).map(q => { const order = shuffle([0, 1, 2, 3]); return { ...q, o: order.map(i => q.o[i]), a: order.indexOf(q.a) }; });
-    for (const p of this.players.values()) Object.assign(p, { score: 0, streak: 0, best: 0, correct: 0, inv: [], hide: [], result: null, draft: null, picked: false, lastPick: null });
+    for (const p of this.players.values()) Object.assign(p, { score: 0, streak: 0, best: 0, correct: 0, inv: [], hide: [], result: null, draft: null, picked: false, lastPick: null, hist: [] });
     this.qStats = []; this.qPlayed = 0; this.prevRank = new Map();
     Sound.play('go'); this.startQuestion(0);
   },
@@ -1872,7 +1951,7 @@ const Host = {
     let right = 0, total = 0;
     for (const p of this.players.values()) {
       const a = this.answers.get(p.pid), pw = this.used.get(p.pid) || null, ok = !!(a && a.final && a.correct);
-      const lines = []; let gained = 0;
+      const lines = []; let gained = 0, saved = 0, lost = 0;
       if (ok) {
         const streak = p.streak + 1, speed = pw === 'freeze' ? 500 : Math.round(500 * clamp(1 - a.ms / limit, 0, 1)), sb = Math.min(streak - 1, 5) * 60;
         lines.push(['Correct answer', '+500']); lines.push([pw === 'freeze' ? 'Speed bonus (frozen)' : 'Speed bonus', '+' + speed]); if (sb) lines.push(['Streak ×' + streak, '+' + sb]);
@@ -1884,10 +1963,11 @@ const Host = {
         gained = Math.round((500 + speed + sb) * mult); p.streak = streak; p.best = Math.max(p.best, streak); p.correct++;
       } else {
         if (pw === 'jeopardy') { gained = -Math.min(500, p.score); lines.push(['Double Jeopardy', String(gained)]); }
-        if (pw === 'saver' && p.streak > 0) lines.push(['Streak saved', '×' + p.streak]); else if (pw !== 'saver') p.streak = 0;
+        if (pw === 'saver' && p.streak > 0) { lines.push(['Streak saved', '×' + p.streak]); saved = p.streak; } else { if (p.streak >= 2) lost = p.streak; p.streak = 0; }
       }
       p.score = Math.max(0, p.score + gained);
-      p.result = { ok, gained, lines, choice: a && a.final ? a.choice : null, none: !(a && a.final), pw };
+      p.result = { ok, gained, lines, choice: a && a.final ? a.choice : null, none: !(a && a.final), pw, streak: p.streak, saved, lost };
+      (p.hist || (p.hist = [])).push({ qi: this.qi, choice: a && a.final ? a.choice : null, ok });
       if (this.isActive(p) || (a && a.final)) { total++; if (ok) right++; }
     }
     this.qStats[this.qi] = { text: q.q, pct: total ? right / total : 0, right, total };
@@ -1933,7 +2013,7 @@ const Host = {
   endGame() { if (this.qPlayed) this.podium(); else this.backToLobby(); },
   backToLobby() {
     this.clearTimers(); this.phase = 'lobby'; this.qi = -1; this.questions = [];
-    for (const p of this.players.values()) Object.assign(p, { score: 0, streak: 0, best: 0, correct: 0, inv: [], hide: [], result: null, draft: null, picked: false, lastPick: null });
+    for (const p of this.players.values()) Object.assign(p, { score: 0, streak: 0, best: 0, correct: 0, inv: [], hide: [], result: null, draft: null, picked: false, lastPick: null, hist: [] });
     this.publish(); this.sendAllMe(); this.renderLobby(); Music.bpm = 104; Music.start();
   },
   kick(pid) { const p = this.players.get(pid); if (!p) return; if (!p.bot) this.net.priv(pid, { t: 'kicked' }); this.players.delete(pid); this.renderPlayers(); this.publishSoon(); },
@@ -2079,6 +2159,7 @@ const Host = {
       ${this.tilesHTML(q, true)}
       <div class="why"><span class="wi">${ICON.bulb}</span><span><b>Why?</b> ${esc(q.why)}</span></div>
       <p class="score-line"><b>${st.right}</b> of ${st.total} got it right</p>
+      ${streakRowHTML([...this.players.values()].map(p => ({ name: p.name, av: p.av, streak: p.result && p.result.ok ? p.streak : 0, lost: p.result ? p.result.lost : 0 })))}
     </main>`, `<span class="hint"><kbd>Space</kbd> continue</span><span class="spacer"></span>
       <button class="btn xl" data-act="h-next">${last ? 'Final results' : 'Leaderboard'} ${ICON.next}</button>`);
   },
@@ -2112,6 +2193,16 @@ const Host = {
     $('#draftTxt').textContent = `${done.length} of ${all.length} picked`;
     $('#draftMini').innerHTML = done.slice(-12).map(p => `<span style="--pc:${POWERUPS[p.lastPick].color}" title="${esc(POWERUPS[p.lastPick].name)}">${PW_ICON[p.lastPick]}</span>`).join('');
   },
+  reviewSection() {
+    const all = [...this.players.values()], humans = all.filter(p => !p.bot), ppl = humans.length ? humans : all;
+    const rows = this.questions.map((q, qi) => {
+      const seen = ppl.filter(p => (p.hist || []).some(h => h.qi === qi)), miss = seen.filter(p => (p.hist || []).some(h => h.qi === qi && !h.ok));
+      return { q, miss: miss.length, total: seen.length };
+    }).filter(x => x.miss > 0).sort((a, b) => b.miss - a.miss);
+    if (!this.qPlayed) return '';
+    if (!rows.length) return `<section class="review"><h3>Perfect game!</h3><p class="sub">Nobody got a question wrong.</p></section>`;
+    return `<section class="review"><h3>Questions to review</h3><p class="sub">Every question someone got wrong, most missed first.</p>${rows.map(x => reviewCardHTML({ q: x.q.q, right: x.q.o[x.q.a], why: x.q.why }, `<p class="rv-meta">Missed by ${x.miss} of ${x.total}</p>`)).join('')}</section>`;
+  },
   renderPodium() {
     const r = this.ranked(), top = [r[1], r[0], r[2]];
     const crown = `<svg class="crown" viewBox="0 0 64 40" aria-hidden="true"><path d="M4 36L8 6L22 22L32 2L42 22L56 6L60 36Z" fill="#FFC42E" stroke="#8F5F00" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="26" r="4" fill="#FF4F7A"/></svg>`;
@@ -2123,6 +2214,7 @@ const Host = {
       <div class="podium">${pod(top[0], 2)}${pod(top[1], 1)}${pod(top[2], 3)}</div>
       ${r.length > 3 ? `<div class="rest">${r.slice(3, 20).map((p, i) => `<span>${i + 4}. <b dir="auto">${esc(p.name)}</b> ${fmtN(p.score)}</span>`).join('')}</div>` : ''}
       <div class="stats"><div class="stat"><b>${Math.round(acc * 100)}%</b><span>class accuracy</span></div><div class="stat"><b>${this.qPlayed}</b><span>questions played</span></div>${hardest ? `<div class="stat"><b>${Math.round(hardest.pct * 100)}%</b><span>on the toughest: “${esc(hardest.text.replace(/___/g, '…'))}”</span></div>` : ''}</div>
+      ${this.reviewSection()}
     </main>`, `<button class="btn ghost" data-act="h-new">New game</button><span class="spacer"></span><button class="btn xl" data-act="h-again">${ICON.play} Play again</button>`);
     Sound.play('drum');
     const show = (id, d) => this.podT.push(setTimeout(() => { const el = $('#pod' + id); if (el) el.classList.add('show'); }, d));
@@ -2286,7 +2378,7 @@ const Player = {
     }
     if (this.pendingUse && (m.used || m.qi !== this.pendingUse.qi)) this.pendingUse = null;
     if (this.pendingPick && (m.picked || m.qi !== this.pendingPick.qi)) this.pendingPick = null;
-    if (prev && prev.result == null && m.result) { Sound.play(m.result.ok ? 'correct' : 'wrong'); vibrate(m.result.ok ? 60 : [80, 60, 80]); }
+    if (prev && prev.result == null && m.result) { Sound.play(m.result.ok ? 'correct' : 'wrong'); vibrate(m.result.ok ? 60 : [80, 60, 80]); if (m.result.ok && m.streak >= 3) setTimeout(() => Sound.play('streak'), 380); }
     this.name = m.name; this.av = m.av;
     this.update();
   },
@@ -2318,7 +2410,8 @@ const Player = {
   partial() { const p = $('#ptsNum'); if (p) p.textContent = fmtN(this.me.score); const n = $('#lobbyN'); if (n) n.textContent = this.pub.n; },
   ptop() {
     const m = this.me;
-    return `<div class="ptop"><span class="me">${avw(m.av)}<b dir="auto">${esc(m.name)}</b></span><span class="pts" id="ptsNum" aria-label="Your score">${fmtN(m.score)}</span>
+    const sk = m.streak >= 1 ? `<span class="streak-pill ${m.streak >= 3 ? 'hot' : ''}" aria-label="Streak: ${m.streak} in a row">${ICON.flame}${m.streak}</span>` : '';
+    return `<div class="ptop"><span class="me">${avw(m.av)}<b dir="auto">${esc(m.name)}</b></span>${sk}<span class="pts" id="ptsNum" aria-label="Your score">${fmtN(m.score)}</span>
       <button class="icon-btn" data-act="p-sound" aria-label="${Sound.on ? 'Turn sound off' : 'Turn sound on'}">${Sound.on ? ICON.soundOn : ICON.soundOff}</button></div>`;
   },
   renderPhase() {
@@ -2407,7 +2500,8 @@ const Player = {
       <div class="gainbig" style="color:${r.gained > 0 ? 'var(--good)' : r.gained < 0 ? 'var(--bad)' : 'var(--muted)'}">${r.gained > 0 ? '+' : ''}${fmtN(r.gained)}</div>
       ${!r.ok ? `<p class="sub">The answer was <b style="color:#fff">${'ABCD'[s.correct]}: ${esc(s.opts[s.correct])}</b></p>` : ''}
       ${r.lines.length ? `<div class="lines">${r.lines.map(([a, b]) => `<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('')}</div>` : ''}
-      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><span class="rankpill">${ordinal(m.rank)} of ${m.n}</span>${m.streak >= 2 ? `<span class="rankpill"><span class="flame" style="font-size:18px">${ICON.flame}${m.streak}</span> streak</span>` : ''}</div>
+      ${streakNote(r, m.streak)}
+      <span class="rankpill">${ordinal(m.rank)} of ${m.n}</span>
       ${s.powers && !s.last ? `<p class="earn ${r.ok ? 'yes' : 'no'}">${r.ok ? `${PW_ICON.gift}You earned a power-up pick!` : 'Only right answers earn a power-up pick.'}</p>` : ''}
       <p class="sub" style="font-size:15px">${esc(s.why || '')}</p>
     </div></div>`;
@@ -2433,6 +2527,7 @@ const Player = {
       <h1 class="bigtitle">${title}</h1>
       <p class="sub">You finished ${ordinal(m.rank)} of ${m.n} with <b style="color:#fff">${fmtN(m.score)}</b> points.</p>
       <div class="lines"><div><span>Correct answers</span><b>${st.correct} of ${st.total}</b></div><div><span>Best streak</span><b>${st.best}</b></div></div>
+      ${m.review ? (m.review.length ? `<section class="review"><h3>Review your mistakes</h3><p class="sub">Here is what to remember for next time.</p>${m.review.map(it => reviewCardHTML(it)).join('')}</section>` : `<p class="earn yes">${ICON.check}Perfect game: no mistakes to review!</p>`) : ''}
       <p class="sub">Stay here. If the host starts another round, you're already in.</p>
     </div></div>`;
     if (m.rank <= 3) Confetti.burst(120);
