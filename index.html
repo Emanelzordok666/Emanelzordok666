@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Clause &amp; Effect</title>
 <meta name="description" content="A live conjunctions quiz battle for Grade 10: host on a big screen, join from phones, build a character and grab power-ups.">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&amp;family=Nunito:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&amp;family=Pacifico&amp;family=Nunito:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800&amp;display=swap">
 <style>
 :root{
   color-scheme: dark;
@@ -91,7 +91,7 @@ h1,h2,h3{text-wrap:balance}
 .mini-logo b{color:var(--sun);font-weight:400;margin:0 2px}
 
 /* ---------- home ---------- */
-.home{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding-block:36px 44px;padding-inline:16px;text-align:center}
+.home{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding-block:36px 96px;padding-inline:16px;text-align:center}
 .tagline{margin:0;font-size:clamp(17px,2.3vw,23px);color:var(--muted);font-weight:800}
 .tagline b{color:#fff}
 .parade{display:flex;justify-content:center;gap:clamp(4px,1.5vw,18px);width:min(720px,100%)}
@@ -560,6 +560,53 @@ button.tile:disabled .tx{text-decoration:line-through}
   .hfoot .hint,.hfoot .spacer{display:none}
   .stat{min-width:140px}
 }
+/* ---------- the makers ---------- */
+.makers-btn{position:absolute;right:calc(env(safe-area-inset-right,0px) + 18px);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:5;display:inline-flex;align-items:center;gap:9px;min-height:48px;padding:8px 18px 8px 12px;border-radius:99px;border:2px solid rgba(255,255,255,.2);background:rgba(33,27,85,.78);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;font-family:var(--font-body);font-weight:900;font-size:15px;letter-spacing:.01em;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.3);transition:transform .15s,background .2s,border-color .2s,box-shadow .15s;animation:mkBtnIn .7s .6s cubic-bezier(.2,1.4,.4,1) both}
+.makers-btn:hover{transform:translateY(-2px);background:rgba(45,37,114,.92);border-color:rgba(255,196,46,.7)}
+.makers-btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+.makers-btn:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+.makers-btn .spark{width:26px;height:26px;border-radius:50%;background:var(--sun);color:var(--ink);display:grid;place-items:center;flex:none;animation:twinkle 2.6s ease-in-out infinite}
+.makers-btn .spark svg{width:16px;height:16px}
+@keyframes mkBtnIn{from{opacity:0;transform:translateY(24px) scale(.8)}to{opacity:1;transform:none}}
+@keyframes twinkle{0%,100%{transform:rotate(0) scale(1)}50%{transform:rotate(25deg) scale(1.15)}}
+.makers-wrap{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:16px}
+.makers-back{position:absolute;inset:0;background:rgba(8,5,30,.64);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);animation:mkFade .35s ease both}
+.makers-card{position:relative;width:min(640px,100%);max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow:auto;overscroll-behavior:contain;background:linear-gradient(160deg,var(--stage-3) 0%,var(--stage-2) 55%,#1A1548 100%);border:3px solid var(--line);border-radius:30px;padding:30px 22px 22px;box-shadow:0 30px 80px rgba(0,0,0,.5),0 10px 0 rgba(0,0,0,.25);text-align:center;transform-origin:var(--ox,100%) var(--oy,100%);animation:mkPop .6s cubic-bezier(.2,1.2,.35,1) both}
+.makers-wrap.closing .makers-back{animation:mkFadeOut .3s ease both}
+.makers-wrap.closing .makers-card{animation:mkOut .3s cubic-bezier(.5,0,.8,.4) both}
+@keyframes mkFade{from{opacity:0}to{opacity:1}}
+@keyframes mkFadeOut{from{opacity:1}to{opacity:0}}
+@keyframes mkPop{0%{opacity:0;transform:scale(.3)}45%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes mkOut{from{opacity:1;transform:none}to{opacity:0;transform:scale(.3)}}
+.makers-x{position:absolute;top:14px;right:14px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.1);color:#fff;display:grid;place-items:center;cursor:pointer;transition:background .2s,transform .2s}
+.makers-x:hover{background:rgba(255,255,255,.2);transform:rotate(90deg)}
+.makers-x:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.makers-x svg{width:22px;height:22px}
+.mk-eyebrow{margin:0;font-size:13px;letter-spacing:.16em;text-transform:uppercase;font-weight:900;color:var(--sun);display:inline-flex;align-items:center;gap:7px}
+.mk-eyebrow svg{width:16px;height:16px;color:var(--pink)}
+.makers-card h2{font-family:var(--font-display);font-weight:400;font-size:clamp(36px,7vw,52px);margin:6px 0 4px;line-height:1}
+.mk-sub{margin:0 0 22px;color:var(--muted);font-size:16px}
+.mk-grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mk{display:flex;align-items:center;gap:12px;padding:10px 16px 10px 10px;border-radius:22px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.12);border-color:color-mix(in srgb,var(--mc) 50%,transparent);text-align:left;min-width:0;animation:mkIn .55s cubic-bezier(.2,1.35,.4,1) both;animation-delay:calc(.2s + var(--i) * .08s)}
+.mk-av{flex:none;width:60px;height:60px;border-radius:18px;background:color-mix(in srgb,var(--mc) 22%,transparent);display:grid;place-items:end center;padding:4px 6px 0;overflow:hidden}
+.mk-av .av{width:100%}
+.mk-name{font-family:'Pacifico','Lilita One',cursive;font-weight:400;font-size:clamp(20px,2.6vw,24px);line-height:1.45;padding-bottom:2px;color:var(--mc);text-shadow:0 3px 0 rgba(0,0,0,.28);min-width:0;overflow-wrap:anywhere}
+@keyframes mkIn{from{opacity:0;transform:translateY(18px) scale(.88)}to{opacity:1;transform:none}}
+.mk-foot{margin:20px 0 0;color:var(--faint);font-size:14px;font-weight:800}
+body.makers-open{overflow:hidden}
+body.makers-open #confetti{z-index:95}
+@media (max-width:560px){
+  .mk-grid{grid-template-columns:1fr;gap:8px}
+  .makers-card{padding:24px 14px 16px;border-radius:26px}
+  .makers-card h2{font-size:34px;margin-top:4px}
+  .mk-sub{margin-bottom:16px;font-size:15px}
+  .mk{padding:6px 14px 6px 6px;gap:12px;border-radius:18px}
+  .mk-av{width:48px;height:48px;border-radius:14px;padding:3px 5px 0}
+  .mk-name{font-size:21px}
+  .mk-foot{margin-top:14px}
+  .makers-x{top:10px;right:10px}
+  .makers-btn{font-size:14px;padding:6px 16px 6px 10px;min-height:44px;right:calc(env(safe-area-inset-right,0px) + 16px);bottom:calc(env(safe-area-inset-bottom,0px) + 22px)}
+}
 @media (prefers-reduced-motion:reduce){
   .bg-rays,.logo .amp,.bob,.ring.low{animation:none}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -622,6 +669,8 @@ const ICON = {
   skip: I('<path d="M5 5l9 7-9 7z" fill="currentColor"/><path d="M19 5v14"/>'),
   check: I('<path d="M4.5 12.5l5 5L19.5 7"/>'),
   x: I('<path d="M6 6l12 12M18 6L6 18"/>'),
+  sparkle: I('<path d="M12 2.5l2.2 6.6 6.8 2.4-6.8 2.4L12 20.5l-2.2-6.6-6.8-2.4 6.8-2.4z" fill="currentColor" stroke-width="1.6"/>'),
+  heart: I('<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z" fill="currentColor" stroke-width="1.6"/>'),
   back: I('<path d="M19 12H5M11 6l-6 6 6 6"/>'),
   soundOn: I('<path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>'),
   soundOff: I('<path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 9.5l5 5M22 9.5l-5 5"/>'),
@@ -996,6 +1045,11 @@ app.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   const t = e.target;
+  if (Credits.wrap) {
+    if (e.key === 'Escape') { e.preventDefault(); Credits.close(); }
+    else if (e.key === 'Tab') { e.preventDefault(); const x = Credits.wrap.querySelector('.makers-x'); x && x.focus(); }
+    return;
+  }
   if (t && t.closest && t.closest('input,textarea,select')) return;
   if ($('#sheetWrap')) { if (e.key === 'Escape') Game.closeSheet(); return; }
   if (Game.phase === 'turn' && !e.ctrlKey && !e.metaKey && !e.altKey && e.key.length === 1) {
@@ -1752,10 +1806,61 @@ const Home = {
       <ol class="how">${online ? '<li>Host opens a lobby</li><li>Phones join with the link or code</li><li>Right answers earn power-ups</li>' : '<li>Make your characters</li><li>Take turns answering</li><li>Right answers earn power-ups</li>'}</ol>
       ${online ? '' : '<p class="sub small">Playing with phones works in the website version of this game.</p>'}
       <div id="installSlot" class="install-slot"></div>
-    </main>`;
+    </main>
+    ${Credits.button()}`;
     Install.show();
   },
 };
+/* ---------- the makers (credits popup on the home screen) ---------- */
+const MAKERS = [
+  { name: 'Adam Essam',        color: '#FFC42E', av: { s: 0, c: 6, e: 0, m: 1, h: 3, x: 1 } },
+  { name: 'Ahmed Tamer',       color: '#FF5FA8', av: { s: 1, c: 1, e: 2, m: 0, h: 1, x: 4 } },
+  { name: 'Abdelrahman Ahmed', color: '#3DDC97', av: { s: 2, c: 7, e: 5, m: 3, h: 6, x: 3 } },
+  { name: 'Marwan Yasser',     color: '#8BE6FF', av: { s: 3, c: 4, e: 1, m: 4, h: 2, x: 0 } },
+  { name: 'Asser Sameh',       color: '#FF8A4C', av: { s: 4, c: 5, e: 3, m: 5, h: 4, x: 2 } },
+  { name: 'Yassin Tamer',      color: '#B99BFF', av: { s: 0, c: 8, e: 0, m: 2, h: 7, x: 1 } },
+];
+const Credits = {
+  wrap: null, from: null, doneT: 0,
+  button() { return `<button class="makers-btn" type="button" data-act="makers" aria-haspopup="dialog"><span class="spark">${ICON.sparkle}</span>Meet the makers</button>`; },
+  open(btn) {
+    if (this.wrap) return;
+    this.from = btn || null;
+    const w = document.createElement('div');
+    w.className = 'makers-wrap';
+    w.innerHTML = `<div class="makers-back" data-mk="close"></div>
+      <section class="makers-card" role="dialog" aria-modal="true" aria-labelledby="mkTitle">
+        <button class="makers-x" type="button" data-mk="close" aria-label="Close">${ICON.x}</button>
+        <p class="mk-eyebrow">${ICON.heart} Made with love by</p>
+        <h2 id="mkTitle">Meet the makers</h2>
+        <p class="mk-sub">The team behind Clause &amp; Effect</p>
+        <ul class="mk-grid">${MAKERS.map((m, i) => `<li class="mk" style="--mc:${m.color};--i:${i}"><span class="mk-av"><span class="bob" style="display:block;width:100%;animation-delay:${i * -0.4}s">${avatarSVG(m.av)}</span></span><span class="mk-name">${esc(m.name)}</span></li>`).join('')}</ul>
+        <p class="mk-foot">Thanks for playing!</p>
+      </section>`;
+    w.addEventListener('click', e => { if (e.target.closest('[data-mk="close"]')) this.close(); });
+    document.body.appendChild(w); document.body.classList.add('makers-open'); this.wrap = w;
+    const card = w.querySelector('.makers-card');
+    if (btn && btn.isConnected) {
+      const b = btn.getBoundingClientRect();
+      card.style.setProperty('--ox', Math.round(b.left + b.width / 2 - card.offsetLeft) + 'px');
+      card.style.setProperty('--oy', Math.round(b.top + b.height / 2 - card.offsetTop) + 'px');
+    }
+    try { Sound.play('streak'); } catch (e) {}
+    setTimeout(() => { if (this.wrap === w) Confetti.burst(90); }, 280);
+    const x = w.querySelector('.makers-x'); try { x.focus({ preventScroll: true }); } catch (e) { x.focus(); }
+  },
+  close() {
+    const w = this.wrap; if (!w || w.classList.contains('closing')) return;
+    w.classList.add('closing');
+    const done = () => {
+      clearTimeout(this.doneT); w.remove(); if (this.wrap === w) this.wrap = null;
+      document.body.classList.remove('makers-open');
+      const f = this.from; this.from = null; if (f && f.isConnected) { try { f.focus({ preventScroll: true }); } catch (e) {} }
+    };
+    if (reduceMotion) done(); else this.doneT = setTimeout(done, 290);
+  },
+};
+Actions['makers'] = el => Credits.open(el);
 Actions['go-home'] = () => Game.home();
 Actions['go-host'] = () => { try { Sound.ensure(); } catch (e) {} Host.setup(); };
 Actions['go-join'] = () => { try { Sound.ensure(); } catch (e) {} Player.start(''); };

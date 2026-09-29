@@ -1,5 +1,5 @@
 // Clause & Effect: always serves the newest game when online, and keeps a copy for offline play.
-const CACHE = 'clause-effect-v6';
+const CACHE = 'clause-effect-v7';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => Promise.all(CORE.map(u => fetch(u, { cache: 'no-store' }).then(r => r.ok && c.put(u, r)).catch(() => {})))).then(() => self.skipWaiting()));
