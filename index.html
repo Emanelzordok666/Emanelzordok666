@@ -561,7 +561,7 @@ button.tile:disabled .tx{text-decoration:line-through}
   .stat{min-width:140px}
 }
 /* ---------- the makers ---------- */
-.makers-btn{position:absolute;right:calc(env(safe-area-inset-right,0px) + 18px);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:5;display:inline-flex;align-items:center;gap:9px;min-height:48px;padding:8px 18px 8px 12px;border-radius:99px;border:2px solid rgba(255,255,255,.2);background:rgba(33,27,85,.78);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;font-family:var(--font-body);font-weight:900;font-size:15px;letter-spacing:.01em;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.3);transition:transform .15s,background .2s,border-color .2s,box-shadow .15s;animation:mkBtnIn .7s .6s cubic-bezier(.2,1.4,.4,1) both}
+.makers-btn{position:fixed;right:calc(env(safe-area-inset-right,0px) + 18px);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:40;display:inline-flex;align-items:center;gap:9px;min-height:48px;padding:8px 18px 8px 12px;border-radius:99px;border:2px solid rgba(255,255,255,.2);background:rgba(33,27,85,.78);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;font-family:var(--font-body);font-weight:900;font-size:15px;letter-spacing:.01em;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.3);transition:transform .15s,background .2s,border-color .2s,box-shadow .15s;animation:mkBtnIn .7s .6s cubic-bezier(.2,1.4,.4,1) both}
 .makers-btn:hover{transform:translateY(-2px);background:rgba(45,37,114,.92);border-color:rgba(255,196,46,.7)}
 .makers-btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.3)}
 .makers-btn:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
@@ -605,7 +605,7 @@ body.makers-open #confetti{z-index:95}
   .mk-name{font-size:21px}
   .mk-foot{margin-top:14px}
   .makers-x{top:10px;right:10px}
-  .makers-btn{font-size:14px;padding:6px 16px 6px 10px;min-height:44px;right:calc(env(safe-area-inset-right,0px) + 16px);bottom:calc(env(safe-area-inset-bottom,0px) + 22px)}
+  .makers-btn{position:absolute;z-index:5;font-size:14px;padding:6px 16px 6px 10px;min-height:44px;right:calc(env(safe-area-inset-right,0px) + 16px);bottom:calc(env(safe-area-inset-bottom,0px) + 22px)}
 }
 @media (prefers-reduced-motion:reduce){
   .bg-rays,.logo .amp,.bob,.ring.low{animation:none}
